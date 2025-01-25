@@ -1,0 +1,97 @@
+package com.mol21.Service_DeliveryRice.model;
+
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+public class Carrito {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrecio;
+
+    @Column(nullable = false)
+    private int totalItems;
+
+    @OneToOne
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    private Usuario usuario;
+
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ItemCarrito> items = new ArrayList<>();
+
+    private boolean procesado ;
+    //al pasar a true se creará el pedido y el carrito será eliminado
+
+    @OneToOne(mappedBy = "carrito", cascade = CascadeType.ALL)
+    private Pedido pedido; // Relación con Pedido
+
+    public boolean isProcesado() {
+        return procesado;
+    }
+
+    public void setProcesado(boolean procesado) {
+        this.procesado = procesado;
+    }
+
+    public long getCarrito_id() {
+        return id;
+    }
+
+    public void setCarrito_id(long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public BigDecimal getTotalPrecio() {
+        return totalPrecio;
+    }
+
+    public void setTotalPrecio(BigDecimal totalPrecio) {
+        this.totalPrecio = totalPrecio;
+    }
+
+    public int getTotalItems() {
+        return totalItems;
+    }
+
+    public void setTotalItems(int totalItems) {
+        this.totalItems = totalItems;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<ItemCarrito> items() {
+        return items;
+    }
+
+    public void setItemCarritoList(List<ItemCarrito> items) {
+        this.items = items;
+    }
+    
+}
