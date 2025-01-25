@@ -19,7 +19,7 @@ public class DireccionService {
         this.repository = repository;
     }
 
-    //Obtener direcciones de un usuario
+    //1.-) Obtener direcciones de un usuario
     public GenericResponse<List<Direccion>> obtenerDirecciones(long usuarioId) {
         return new GenericResponse<>(
                 Global.TIPO_DATA,
@@ -29,9 +29,10 @@ public class DireccionService {
         );
     }
 
-    //Marcar una direccion como principal
-    public GenericResponse<Direccion> setDireccionPrincipal(Direccion d){
-        Optional<Direccion> optDireccion = repository.findById(d.getDireccion_id());
+    // 2.-) Marcar una direccion como principal
+
+    public GenericResponse<Direccion> setDireccionPrincipal(long idDireccion){
+        Optional<Direccion> optDireccion = repository.findById(idDireccion);
 
         if(!optDireccion.isPresent()){
             return new GenericResponse<>(
@@ -44,14 +45,14 @@ public class DireccionService {
             Direccion direccionTemporal = (Direccion) optDireccion.get();
 
             //Validamos que la direccion pertenece al usuario
-            if(direccionTemporal.getUsuario().get_id() != d.getUsuario().get_id()){
+            /*if (direccionTemporal.getUsuario().get_id() != idUsuario) {
                 return new GenericResponse<>(
                         Global.TIPO_DATA,
                         Global.RPTA_WARNING,
                         "La direccion no pertenece al usuario",
                         null
                 );
-            }else{
+            } else {*/
                 //Eliminamos atributo a la direccion principal
                 repository.resetPrincipal(direccionTemporal.getUsuario().get_id());
 
@@ -64,9 +65,12 @@ public class DireccionService {
                         "dirección establecida como principal",
                         repository.save(direccionTemporal)
                 );
-            }
+            //}
         }
     }
+    //3.-) Agregar una nueva direccion
+    //4.-) Modificar una direccion
+    //5.-) Eliminar una direccion
 
 
 

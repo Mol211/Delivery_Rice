@@ -22,9 +22,9 @@ public class DireccionController {
     }
 
     //Endpoing para que el cliente pueda marcar una direccion como principal
-    @PutMapping("/principal")
-    public GenericResponse<Direccion>hacerPrincipal(@RequestBody Direccion d){
-        return service.setDireccionPrincipal(d);
+    @PutMapping("/principal={id}")
+    public GenericResponse<Direccion>hacerPrincipal(@PathVariable long id){
+        return service.setDireccionPrincipal(id);
     }
 
 
