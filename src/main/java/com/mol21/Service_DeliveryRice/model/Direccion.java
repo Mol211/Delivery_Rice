@@ -13,7 +13,7 @@ import java.util.Set;
 public class Direccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String calle;
@@ -43,11 +43,11 @@ public class Direccion {
     @OneToMany(mappedBy = "direccionEnvio")
     private List<Pedido> lista_pedidos;
 
-    public long getDireccion_id() {
+    public Long getDireccion_id() {
         return id;
     }
 
-    public void setDireccion_id(long id) {
+    public void setDireccion_id(Long id) {
         this.id = id;
     }
 

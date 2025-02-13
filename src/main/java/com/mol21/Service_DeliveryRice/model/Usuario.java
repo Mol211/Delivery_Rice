@@ -27,6 +27,7 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
+
     @Column(nullable = false)
     private String telefono;
 
@@ -34,9 +35,12 @@ public class Usuario {
     @Column(nullable = false, updatable = false)
     LocalDateTime fechaCreacion;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Rol rol;
+
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private Set<Direccion> direccionesUsuario = new HashSet<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -117,5 +121,13 @@ public class Usuario {
 
     public Usuario() {
         this.fechaCreacion = LocalDateTime.now();
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }

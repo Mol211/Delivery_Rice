@@ -9,9 +9,10 @@ import java.util.Optional;
 
 
 public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
-    @Query("SELECT u FROM Usuario u WHERE u.email = :email")
-    Optional<Usuario> login(String email, String password);
 
     boolean existsByEmail(String email);
+    @Query("SELECT u.email FROM Usuario u WHERE u.id = :id")
+    String findEmailById(long id);
 
+    Optional<Usuario> findByEmail(String email);
 }

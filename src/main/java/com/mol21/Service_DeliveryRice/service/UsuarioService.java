@@ -1,5 +1,7 @@
 package com.mol21.Service_DeliveryRice.service;
 
+import com.mol21.Service_DeliveryRice.model.DTO.UsuarioDTO;
+import com.mol21.Service_DeliveryRice.model.Rol;
 import com.mol21.Service_DeliveryRice.model.Usuario;
 import com.mol21.Service_DeliveryRice.persistence.UsuarioRepository;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
@@ -7,8 +9,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.mol21.Service_DeliveryRice.utils.Global;
-
 import java.util.Optional;
+
+import static com.mol21.Service_DeliveryRice.model.Rol.*;
 
 @Service
 @Transactional
@@ -22,73 +25,91 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public GenericResponse<Usuario> login(String email, String password) {
-        Optional<Usuario> usuarioOptional = repository.login(email, password);
-        if (usuarioOptional.isPresent()) {
-            //Si usuario existe se instancia
-            Usuario usuario = usuarioOptional.get();
-            System.out.println("Contraseña ingresada: " + password);
-            System.out.println("Hash de la BD: " + usuarioOptional.get().getPassword());
-            //if (passwordEncoder.matches(password, usuario.getPassword())) {
-            if (password.equals(usuario.getPassword())) {
-                return new GenericResponse<Usuario>(
-                        Global.TIPO_AUTH,
-                        Global.RPTA_OK,
-                        "Has iniciado sesión correctamente",
-                        usuarioOptional.get()
-                );
-            } else {
-                return new GenericResponse<Usuario>(
-                        Global.TIPO_AUTH,
-                        Global.RPTA_WARNING,
-                        "Contraseña incorrecta",
-                        new Usuario()
-                );
-            }
-        } else {
-            return new GenericResponse<Usuario>(
-                    Global.TIPO_AUTH,
-                    Global.RPTA_WARNING,
-                    "Usuario no encontrado",
-                    new Usuario()
-            );
-        }
-    }
 
-    public GenericResponse<Usuario> registrarUsuario(Usuario u) {
-        //nos dan un usuario y queremos encontrarlo en la BD
-        Optional<Usuario> optU = repository.findById(u.get_id());
-        //Si ese usuario no existe:
-        // buscamos si existe un email en la BD
-        //Si no existe, creamos un usuario
-        if (!optU.isPresent()) {
-            if (repository.existsByEmail(u.getEmail())) {
-                return new GenericResponse<>(
-                        Global.TIPO_AUTH,
-                        Global.RPTA_WARNING,
-                        "Ya existe un usuario con ese correo, introduzca uno válido",
-                        null
-                );
-            } else {
-                return new GenericResponse<>(
-                        Global.TIPO_DATA,
-                        Global.RPTA_OK,
-                        "Se ha creado un nuevo usuario",
-                        repository.save(u)
-                );
-            }
-            //Si el optional no está vacío, entonces actualiza los datos del usuario
-        } else {
+    //Registrar un usuario
+    private GenericResponse<UsuarioDTO> registrarUsuario(Usuario u, Rol rol) {
+        if (repository.existsByEmail(u.getEmail())) {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
-                    "No se puede crear el usuario",
+                    "El usuario ya está registrado",
+                    null
+            );
+        }
+        return crearUsuario(u, rol);
+    }
+    //Registramos un Cliente
+    public GenericResponse<UsuarioDTO> registrarCliente(Usuario u) {
+        return registrarUsuario(u, CLIENTE);
+    }
+    //Registramos un Repartidor
+    public GenericResponse<UsuarioDTO> registrarRepartidor(Usuario u) {
+        return registrarUsuario(u, REPARTIDOR);
+    }
+
+    //Crear un usuario si no existe el Email en la BD
+    public GenericResponse<UsuarioDTO> crearUsuario(Usuario u, Rol rol) {
+        if (repository.existsByEmail(u.getEmail())) {
+            return new GenericResponse<>(
+                    Global.TIPO_AUTH,
+                    Global.RPTA_WARNING,
+                    "Ya existe un usuario con ese correo, introduzca uno válido",
+                    null
+            );
+        } else {
+            u.setRol(rol);
+            u.setPassword(passwordEncoder.encode(u.getPassword()));
+            UsuarioDTO usuarioDto = new UsuarioDTO(repository.save(u));
+            return new GenericResponse<>(
+                    Global.TIPO_DATA,
+                    Global.RPTA_OK,
+                    "Se ha creado un nuevo usuario",
+                    usuarioDto);
+        }
+
+
+    }
+
+   //Login de usuario
+    public GenericResponse<UsuarioDTO> login(String email, String password) {
+        Optional<Usuario> optU = repository.findByEmail(email);
+        //Optional<Usuario> usuarioOptional = repository.login(email, password);
+        if (optU.isPresent()) {
+            //Si usuario existe se instancia
+            Usuario u = optU.get();
+            String passwordT = optU.get().getPassword();
+            UsuarioDTO usuarioDto = new UsuarioDTO(u);
+            System.out.println("Contraseña ingresada: " + password);
+            System.out.println("Hash de la BD: " + passwordT);
+            if (passwordEncoder.matches(password, passwordT)) {
+            //if (password.equals(usuario.getPassword())) {
+                return new GenericResponse<>(
+                        Global.TIPO_AUTH,
+                        Global.RPTA_OK,
+                        "Has iniciado sesión correctamente",
+                        usuarioDto
+                );
+            } else {
+                return new GenericResponse<>(
+                        Global.TIPO_AUTH,
+                        Global.RPTA_WARNING,
+                        "Contraseña incorrecta",
+                        null
+                );
+            }
+        }
+        else {
+            return new GenericResponse<>(
+                    Global.TIPO_AUTH,
+                    Global.RPTA_WARNING,
+                    "Usuario no encontrado",
                     null
             );
         }
     }
 
-    public GenericResponse<Usuario> updateUsuario(long id, Usuario u) {
+    //El cliente puede modificar sus datos
+    public GenericResponse<UsuarioDTO> modificarCliente(long id, Usuario u) {
         Optional<Usuario> optU = repository.findById(id);
         if (optU.isPresent()) {
             Usuario usuarioExistente = optU.get();
@@ -99,24 +120,25 @@ public class UsuarioService {
                         "Ya existe un usuario con ese correo, introduzca uno válido",
                         null
                 );
-            } else {
-//Obtenemos usuario de BD
+            }
+            else {
+                //Obtenemos usuario de BD
 
                 usuarioExistente.setEmail(u.getEmail());
-                usuarioExistente.setPassword(u.getPassword());
+                usuarioExistente.setPassword(passwordEncoder.encode(u.getPassword()));
                 usuarioExistente.setNombre(u.getNombre());
                 usuarioExistente.setApellido(u.getApellido());
                 usuarioExistente.setTelefono(u.getTelefono());
-
                 return new GenericResponse<>(
                         Global.TIPO_AUTH,
                         Global.RPTA_OK,
                         "Se han actualizado los datos del usuario " + usuarioExistente.get_id(),
-                        repository.save(usuarioExistente)
+                        new UsuarioDTO(repository.save(usuarioExistente))
                 );
             }
 
-        } else {
+        }
+        else {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
@@ -126,39 +148,7 @@ public class UsuarioService {
         }
     }
 }
-//    public GenericResponse<Usuario> registrarUsuario(Usuario u) {
-//        Optional<Usuario> usuarioOptional = this.repository.findById(u.getUsuario_id());
-//        if(repository.existsByEmail(usuarioOptional.get().getEmail()) &&
-//                (usuarioOptional.isEmpty())||
-//                !usuarioOptional.get().getEmail().equals(u.getEmail())) {
-//            return new GenericResponse<>(
-//                    Global.TIPO_DATA,
-//                    Global.RPTA_WARNING,
-//                    "Ese correo ya existe en un usuario",
-//                    null
-//            );
-//        }
-//        //Si el usuario existe ya en la base de datos idTemp = un numero, si nuevo usuario idTemp = 0
-//        long idTemp = usuarioOptional.isPresent() ? usuarioOptional.get().getUsuario_id() : 0;
-//        if(idTemp == 0){
-//            //JPA detecta el ID y si no existe en la BD crea un objeto nuevo
-//            return new GenericResponse<>(
-//                    Global.TIPO_DATA,
-//                    Global.RPTA_OK,
-//                    "Usuario registrado correctamente",
-//                    this.repository.save(u)
-//            );
-//        } else {
-//            return new GenericResponse<>(
-//                    Global.TIPO_DATA,
-//                    Global.RPTA_OK,
-//                    "Datos de usuario actualizados",
-//                    this.repository.save(u)
-//            );
-//
-//           }
-//
-//    }
+
 
 
 
