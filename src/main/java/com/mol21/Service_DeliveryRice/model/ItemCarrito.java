@@ -25,6 +25,17 @@ public class ItemCarrito {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    public ItemCarrito(int cantidad, Carrito carrito, Producto producto) {
+        this.cantidad=cantidad;
+        this.producto= producto;
+        this.carrito = carrito;
+        this.subTotal = producto.getPrecio().multiply(BigDecimal.valueOf(cantidad));
+    }
+
+    public ItemCarrito() {
+
+    }
+
     public long getItem_id() {
         return id;
     }
@@ -38,7 +49,9 @@ public class ItemCarrito {
     }
 
     public void setCantidad(int cantidad) {
+
         this.cantidad = cantidad;
+        this.subTotal= producto.getPrecio().multiply(BigDecimal.valueOf(cantidad));
     }
 
     public BigDecimal getSubTotal() {

@@ -23,7 +23,7 @@ public class Carrito {
     private BigDecimal totalPrecio;
 
     @Column(nullable = false)
-    private int totalItems;
+    private int totalProductos;
 
     @OneToOne
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
@@ -70,12 +70,12 @@ public class Carrito {
         this.totalPrecio = totalPrecio;
     }
 
-    public int getTotalItems() {
-        return totalItems;
+    public int getTotalProductos() {
+        return totalProductos;
     }
 
-    public void setTotalItems(int totalItems) {
-        this.totalItems = totalItems;
+    public void setTotalProductos(int totalProductos) {
+        this.totalProductos = totalProductos;
     }
 
     public Usuario getUsuario() {
