@@ -11,8 +11,8 @@ import com.mol21.Service_DeliveryRice.persistence.ProductoRepository;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
-import static java.math.BigInteger.ZERO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,37 +25,37 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final CarritoRepository carritoRepository;
     private final ProductoRepository productoRepository;
-    public ItemService(ItemRepository itemRepository, CarritoRepository carritoRepo, ProductoRepository productoRepository){
+
+    public ItemService(ItemRepository itemRepository, CarritoRepository carritoRepo, ProductoRepository productoRepository) {
         this.itemRepository = itemRepository;
         this.carritoRepository = carritoRepo;
         this.productoRepository = productoRepository;
     }
     /*
-    * Métodos del Servicio de ItemCarrito:
-    * agregarItemAlCarrito(carritoid, producto, cantidad)
-    * actualizarItem(ItemCarrito)
-    * eliminarItem(id)
-    * vaciarCarrito(carrito)
-    * listarItemsByCarrito(carritoId)*/
+     * Métodos del Servicio de ItemCarrito:
+     * agregarItemAlCarrito(carritoid, producto, cantidad)
+     * actualizarItem(ItemCarrito)
+     * eliminarItem(id)
+     * vaciarCarrito(carrito)
+     * listarItemsByCarrito(carritoId)*/
 
-    //Listar Items de un Carrito
-    public GenericResponse<List<ItemDTO>> getItemsByCarrito(long carritoId){
+    //1.- Listar Items de un Carrito
+    public GenericResponse<List<ItemDTO>> getItemsByCarrito(long carritoId) {
         Optional<Carrito> carritoOpt = carritoRepository.findById(carritoId);
-        if(carritoOpt.isPresent()){
+        if (carritoOpt.isPresent()) {
             ArrayList<ItemDTO> itemsDTOS = new ArrayList<>();
             List<ItemCarrito> items = itemRepository.findByCarrito(carritoOpt.get());
-            if(!items.isEmpty()){
-                for(ItemCarrito item : items){
+            if (!items.isEmpty()) {
+                for (ItemCarrito item : items) {
                     itemsDTOS.add(new ItemDTO(item));
                 }
-
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
                         "Se han obtenido la lista de items del carrito",
                         itemsDTOS);
 
-            }else{
+            } else {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
@@ -64,7 +64,7 @@ public class ItemService {
                 );
             }
 
-        } else{
+        } else {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
@@ -73,7 +73,6 @@ public class ItemService {
         }
 
     }
-
     //2.- Agregar Item a Carrito
     public GenericResponse<CarritoDTO> addItemsToCarrito(long carritoId, long productoID, int cantidad) {
         Optional<Producto> optP = productoRepository.findById(productoID);
@@ -92,12 +91,12 @@ public class ItemService {
                 //Si la nueva cantidad es menor o igual a cero, elimina el Item del Carrito
                 if (nuevaCantidad <= 0) {
                     deleteItem(item, carrito);
-                    ArrayList<ItemDTO> listaDTOS = obtenerListaDTOS(carrito);
+                    CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "Se ha eliminado el ItemCarrito ",
-                            new CarritoDTO(carrito,listaDTOS)
+                            carritoDTO
                     );
                 }
                 //Si la cantidad no menor que Cero actualiza la cantidad,el precio del Carrito y la cantidad de productos.
@@ -108,12 +107,12 @@ public class ItemService {
                     //Actualizamos BD
                     carritoRepository.save(carrito);
                     itemRepository.save(item);
-                    ArrayList<ItemDTO> listaDTOS = obtenerListaDTOS(carrito);
+                    CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "Producto modificado",
-                            new CarritoDTO(carrito, listaDTOS)
+                            carritoDTO
                     );
                 }
             }
@@ -127,22 +126,17 @@ public class ItemService {
                     carrito.setTotalProductos(carrito.getTotalProductos() + cantidad);
                     carrito.setTotalPrecio(carrito.getTotalPrecio().add(item.getSubTotal()));
                     carritoRepository.save(carrito);
-                    ArrayList<ItemDTO> itemsDTOS = new ArrayList<>();
-                    List<ItemCarrito> items = itemRepository.findByCarrito(carrito);
-                    for (ItemCarrito i : items) {
-                        itemsDTOS.add(new ItemDTO(i));
-                    }
+                    CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
                     //Devolvemos la respuesta con el itemDTO
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "Producto agregado al carrito",
-                            new CarritoDTO(carrito, itemsDTOS)
+                            carritoDTO
                     );
 
 
-                }
-                else {
+                } else {
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_WARNING,
@@ -159,16 +153,6 @@ public class ItemService {
             );
         }
     }
-
-    private ArrayList<ItemDTO> obtenerListaDTOS(Carrito carrito) {
-        ArrayList<ItemDTO> listaDTOS = new ArrayList<>();
-        List<ItemCarrito> items = itemRepository.findByCarrito(carrito);
-        for (ItemCarrito i : items) {
-            listaDTOS.add(new ItemDTO(i));
-        }
-        return listaDTOS;
-    }
-
     //3.- ActualizarItem
     public GenericResponse<CarritoDTO> modificarCantidad(long itemId, int cantidad) {
         Optional<ItemCarrito> optI = itemRepository.findById(itemId);
@@ -198,27 +182,27 @@ public class ItemService {
                 carritoRepository.save(carrito);
 
                 //Creamos lista de items del carrito y creamos lista de ItemsDTO
-                ArrayList<ItemDTO> listaDTOS = obtenerListaDTOS(carrito);
+                CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
 
 
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
                         "Carrito actualizado con éxito",
-                        new CarritoDTO(carrito, listaDTOS)
+                        carritoDTO
                 );
 
             } else {
                 deleteItem(item, carrito);
 
                 //Creamos lista de items del carrito y creamos lista de ItemsDTO
-                ArrayList<ItemDTO> listaDTOS = obtenerListaDTOS(carrito);
+                CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
 
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
                         "Item eliminado del carrito",
-                        new CarritoDTO(carrito, listaDTOS)
+                        carritoDTO
                 );
             }
         } else {
@@ -230,26 +214,25 @@ public class ItemService {
             );
         }
     }
-
     //4.- EliminarItem
-    public GenericResponse<CarritoDTO> eliminarItem(long itemId){
+    public GenericResponse<CarritoDTO> eliminarItem(long itemId) {
         Optional<ItemCarrito> optI = itemRepository.findById(itemId);
-        if(optI.isPresent()){
+        if (optI.isPresent()) {
             //Si existe lo eliminamos y actualizamos el carrito
             ItemCarrito item = optI.get();
             Carrito carrito = item.getCarrito();
             ItemDTO itemDTO = new ItemDTO(item);
             deleteItem(item, carrito);
 
-            ArrayList<ItemDTO> listaDTOS = obtenerListaDTOS(carrito);
+            CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
 
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_OK,
-                    "Producto eliminado del carrito: "+itemDTO.getNombreProducto(),
-                    new CarritoDTO(carrito, listaDTOS)
+                    "Producto eliminado del carrito: " + itemDTO.getNombreProducto(),
+                    carritoDTO
             );
-        }else{
+        } else {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
@@ -258,22 +241,13 @@ public class ItemService {
             );
         }
     }
-
-    private void deleteItem(ItemCarrito item, Carrito carrito) {
-        carrito.items().remove(item);
-        carrito.setTotalProductos(carrito.getTotalProductos() - item.getCantidad());
-        carrito.setTotalPrecio(carrito.getTotalPrecio().subtract(item.getSubTotal()));
-        itemRepository.deleteById(item.getItem_id());
-        carritoRepository.save(carrito);
-    }
-
     //5.- VaciarCarrito
-    public GenericResponse<CarritoDTO> vaciarCarrito(long carritoId){
+    public GenericResponse<CarritoDTO> vaciarCarrito(long carritoId) {
         Optional<Carrito> optC = carritoRepository.findById(carritoId);
-        if(optC.isPresent()){
+        if (optC.isPresent()) {
             Carrito carrito = optC.get();
-            if(!carrito.items().isEmpty()){
-                carrito.items().clear();
+            if (!carrito.Items().isEmpty()) {
+                carrito.Items().clear();
                 carrito.setTotalProductos(0);
                 carrito.setTotalPrecio(BigDecimal.ZERO);
                 itemRepository.deleteByCarrito(carrito);
@@ -284,7 +258,7 @@ public class ItemService {
                         "Se ha vaciado el carrito",
                         new CarritoDTO(carrito)
                 );
-            }else{
+            } else {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
@@ -293,7 +267,7 @@ public class ItemService {
                 );
             }
 
-        }else{
+        } else {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
@@ -301,6 +275,23 @@ public class ItemService {
                     null
             );
         }
+    }
+    //Funcion para obtener una lista de ItemsDTOS a partir del carrito(
+    private CarritoDTO obtenerCarritoDTO(Carrito carrito) {
+        ArrayList<ItemDTO> listaDTOS = new ArrayList<>();
+        List<ItemCarrito> items = itemRepository.findByCarrito(carrito);
+        for (ItemCarrito i : items) {
+            listaDTOS.add(new ItemDTO(i));
+        }
+        return new CarritoDTO(carrito,listaDTOS);
+    }
+    //Funcion para eliminar un Item
+    private void deleteItem(ItemCarrito item, Carrito carrito) {
+        carrito.Items().remove(item);
+        carrito.setTotalProductos(carrito.getTotalProductos() - item.getCantidad());
+        carrito.setTotalPrecio(carrito.getTotalPrecio().subtract(item.getSubTotal()));
+        itemRepository.deleteById(item.getItem_id());
+        carritoRepository.save(carrito);
     }
 
 

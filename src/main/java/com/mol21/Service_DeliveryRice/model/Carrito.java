@@ -86,7 +86,7 @@ public class Carrito {
         this.usuario = usuario;
     }
 
-    public List<ItemCarrito> items() {
+    public List<ItemCarrito> Items() {
         return items;
     }
 

@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mol21.Service_DeliveryRice.model.EstadoPedido.PENDIENTE;
+
 @Entity
 public class Pedido {
 
@@ -33,9 +35,6 @@ public class Pedido {
     @Column(nullable = false)
     private MetodoPago metodoPago;
 
-    @Column(nullable = false)
-    private String telefonoContacto;
-
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
@@ -50,6 +49,16 @@ public class Pedido {
     @OneToOne
     @JoinColumn(name = "carrito_id", nullable = false)
     private Carrito carrito; // Relación con Carrito
+
+    public Pedido(Carrito carrito, Direccion direccion, MetodoPago metodoPago) {
+        this.carrito=carrito;
+        this.direccionEnvio = direccion;
+        this.metodoPago = metodoPago;
+        this.estadoPedido = PENDIENTE;
+        this.usuario = carrito.getUsuario();
+        this.fechaCreacion = LocalDateTime.now();
+        this.totalPrecio = carrito.getTotalPrecio();
+    }
 
     public long getId_pedido() {
         return id;
@@ -113,14 +122,6 @@ public class Pedido {
 
     public void setMetodoPago(MetodoPago metodoPago) {
         this.metodoPago = metodoPago;
-    }
-
-    public String getTelefonoContacto() {
-        return telefonoContacto;
-    }
-
-    public void setTelefonoContacto(String telefonoContacto) {
-        this.telefonoContacto = telefonoContacto;
     }
 
     public Direccion getDireccionEnvio() {
