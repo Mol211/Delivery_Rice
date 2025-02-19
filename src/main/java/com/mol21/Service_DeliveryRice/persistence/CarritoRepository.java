@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface CarritoRepository extends CrudRepository<Carrito, Long> {
 
-    Optional<Carrito> findByUsuarioAndEsProcesadoFalse(Usuario usuario);
+    Optional<Carrito> findByUsuarioAndProcesadoFalse(Usuario usuario);
 
 }

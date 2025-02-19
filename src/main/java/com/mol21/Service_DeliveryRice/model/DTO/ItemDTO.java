@@ -15,6 +15,7 @@ public class ItemDTO {
     private String nombreProducto;
     private BigDecimal precioUnitario;
     private String imagenUrl;
+    private int stockDisponible;
 
 
 
@@ -26,6 +27,7 @@ public class ItemDTO {
         this.precioUnitario = item.getProducto().getPrecio();
         this.imagenUrl = item.getProducto().getImagenUrl();
         this.idProducto = item.getProducto().getId_product();
+        this.stockDisponible = item.getProducto().getStock()-cantidad;
     }
 
     public void setId(long id) {

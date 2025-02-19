@@ -50,6 +50,11 @@ public class Pedido {
     @JoinColumn(name = "carrito_id", nullable = false)
     private Carrito carrito; // Relación con Carrito
 
+    @ManyToOne
+    @JoinColumn(name = "repartidor_id", referencedColumnName = "id") // Repartidor asignado al pedido
+    private Usuario repartidor;
+
+
     public Pedido(Carrito carrito, Direccion direccion, MetodoPago metodoPago) {
         this.carrito=carrito;
         this.direccionEnvio = direccion;
@@ -131,4 +136,13 @@ public class Pedido {
     public void setDireccionEnvio(Direccion direccionEnvio) {
         this.direccionEnvio = direccionEnvio;
     }
+    public Usuario getRepartidor() {
+        return repartidor;
+    }
+
+    public void setRepartidor(Usuario repartidor) {
+        this.repartidor = repartidor;
+    }
+
+
 }

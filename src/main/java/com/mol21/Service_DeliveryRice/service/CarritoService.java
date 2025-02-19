@@ -1,16 +1,14 @@
 package com.mol21.Service_DeliveryRice.service;
 
 import com.mol21.Service_DeliveryRice.model.*;
-import com.mol21.Service_DeliveryRice.model.DTO.CarritoDTO;
-import com.mol21.Service_DeliveryRice.model.DTO.DetalleDTO;
-import com.mol21.Service_DeliveryRice.model.DTO.ItemDTO;
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
+import com.mol21.Service_DeliveryRice.model.DTO.*;
 import com.mol21.Service_DeliveryRice.persistence.*;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -48,10 +46,11 @@ public class CarritoService {
         if(optU.isPresent()){
             Usuario usuario = optU.get();
             //Tiene que saber si existe un carrito que no esté procesado porque no puede tener más de un carrito procesado
-            Optional <Carrito> optC = carritoRepository.findByUsuarioAndEsProcesadoFalse(usuario);
+            Optional <Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
             if(!optC.isPresent()){
                 Carrito carrito = new Carrito();
                 carrito.setUsuario(optU.get());
+                carrito.setTotalPrecio(BigDecimal.ZERO);
                 carritoRepository.save(carrito);
                 return new GenericResponse<>(
                         TIPO_DATA,
@@ -84,39 +83,47 @@ public class CarritoService {
         }
     }
 
-    //2.- Descartar un Carrito
-    public GenericResponse<CarritoDTO> descartarCarrito(long idUsuario){
+    //2.- Vaciar un carrito
+    public GenericResponse<CarritoDTO> vaciarCarrito(long idUsuario) {
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
-        if(optU.isPresent()){
+        if (optU.isPresent()) {
             Usuario usuario = optU.get();
-            Optional<Carrito> optC = carritoRepository.findByUsuarioAndEsProcesadoFalse(usuario);
-            if(optC.isPresent()){
+            Optional<Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
+            if (optC.isPresent()) {
                 Carrito carrito = optC.get();
-                carritoRepository.delete(carrito);
-                Carrito carrito1 = new Carrito();
-                carrito1.setUsuario(usuario);
-                carritoRepository.save(carrito1);
-                return new GenericResponse<>(
-                        TIPO_DATA,
-                        RPTA_OK,
-                        "Se ha descartado el carrito antiguo y se ha creado uno nuevo",
-                        new CarritoDTO(carrito1)
-                );
-            }
-            else{
+                if (!carrito.Items().isEmpty()) {
+                    carrito.Items().clear();
+                    carrito.setTotalProductos(0);
+                    carrito.setTotalPrecio(BigDecimal.ZERO);
+                    carritoRepository.save(carrito);
+                    return new GenericResponse<>(
+                            TIPO_DATA,
+                            RPTA_OK,
+                            "Se ha vaciado el carrito",
+                            new CarritoDTO(carrito)
+                    );
+                } else {
+                    return new GenericResponse<>(
+                            TIPO_DATA,
+                            RPTA_WARNING,
+                            "El carrito ya está vacío",
+                            null
+                    );
+                }
+
+            } else {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
-                        "No se encuentra ningún carrito sin procesar",
+                        "No existe ese Producto",
                         null
                 );
             }
-
-        } else{
+        } else {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se ha encontrado el usuario",
+                    "No se encuentra ese usuario",
                     null
             );
         }
@@ -127,7 +134,7 @@ public class CarritoService {
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
         if (optU.isPresent()) {
             Usuario usuario = optU.get();
-            Optional<Carrito> optC = carritoRepository.findByUsuarioAndEsProcesadoFalse(usuario);
+            Optional<Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
             if (optC.isPresent()) {
                 Carrito carritoSinProcesar = optC.get();
                 return new GenericResponse<>(
@@ -148,7 +155,7 @@ public class CarritoService {
         }else{
             return new GenericResponse<>(
                     TIPO_DATA,
-                    RPTA_WARNING,
+                    RPTA_ERROR,
                     "No se encuentra el usuario",
                     null
             );
@@ -269,8 +276,6 @@ public class CarritoService {
                 //Si Validar is RPTA_OK Carrito está validado
                 //Creamos un nuevo pedido y actualizamos el stock del almacen
                 Pedido pedido = new Pedido(carrito, direccion, metodoPago);
-                pedidoRepository.save(pedido);
-
                 //Cada Item se transforma en un detalle del pedido
                 List<DetallePedido> detallePedidoList = new ArrayList<>();
                 for(ItemCarrito item : carrito.Items()) {
@@ -285,6 +290,9 @@ public class CarritoService {
                     p.setStock(p.getStock() - detalle.getCantidad());
                     productoRepository.save(p);
                 }
+                pedido.setDetalles(detallePedidoList);
+                pedido.setTotalDetalles(pedido.getDetalles().size());
+                pedidoRepository.save(pedido);
                 detalleRepository.saveAll(detallePedidoList);
                 //Procesamos el carrito y creamos uno nuevo
                 carrito.setProcesado(true);
@@ -299,7 +307,7 @@ public class CarritoService {
                         TIPO_DATA,
                         RPTA_OK,
                         "Se ha procedo el carrito y se ha creado el pedido",
-                        new PedidoDTO(pedido, listaDetallesDTOS)
+                        new PedidoDTOCliente(pedido, listaDetallesDTOS)
                 );
             }
         }

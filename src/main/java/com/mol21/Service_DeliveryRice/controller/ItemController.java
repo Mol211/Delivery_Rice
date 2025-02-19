@@ -16,6 +16,7 @@ import java.util.List;
 public class ItemController {
     private final ItemService service;
 
+
     public ItemController(ItemService service) {
         this.service = service;
     }
@@ -39,11 +40,6 @@ public class ItemController {
     @DeleteMapping("eliminar-item/{idItem}")
     public GenericResponse<CarritoDTO> eliminarItem(@PathVariable long idItem){
         return service.eliminarItem(idItem);
-    }
-
-    @DeleteMapping("vaciar-carrito/{idCarrito}")
-    public GenericResponse<CarritoDTO> vaciarCarrito(@PathVariable long idCarrito){
-        return service.vaciarCarrito(idCarrito);
     }
 
 
