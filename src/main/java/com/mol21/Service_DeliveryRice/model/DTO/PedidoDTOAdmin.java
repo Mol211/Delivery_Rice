@@ -10,7 +10,6 @@ public class PedidoDTO {
     private long usuarioId;
     private long direccionId;
     private String nombreUsuario;
-    private String telefonoUsuario;
     private String email;
     private BigDecimal precioTotal;
     private int totalProductos;
@@ -24,7 +23,6 @@ public class PedidoDTO {
         this.direccionId = pedido.getDireccionEnvio().getDireccion_id();
         this.nombreUsuario = pedido.getUsuario().getNombre()+" "+pedido.getUsuario().getApellido();
         this.email = pedido.getUsuario().getEmail();
-        this.telefonoUsuario = pedido.getUsuario().getTelefono();
         this.precioTotal = pedido.getTotalPrecio();
         this.totalProductos = pedido.getDetalles().size();
         this.estadoPedido = pedido.getEstadoPedido();
