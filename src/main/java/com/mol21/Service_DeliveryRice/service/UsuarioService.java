@@ -25,7 +25,7 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
+    //El administrador debe tener un metodo para listar usuarios y otro para clientes
     //Registrar un usuario
     private GenericResponse<UsuarioDTO> registrarUsuario(Usuario u, Rol rol) {
         if (repository.existsByEmail(u.getEmail())) {
