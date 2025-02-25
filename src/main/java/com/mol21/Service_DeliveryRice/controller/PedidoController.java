@@ -23,7 +23,7 @@ public class PedidoController {
         return pedidoService.obtenerPedidosUsuario(usuarioId);
     }
 
-    @GetMapping("/{idPedido}")
+    @GetMapping("/{pedidoId}")
     public GenericResponse<PedidoDTOCliente>obtenerPedido(@PathVariable long pedidoId){
         return pedidoService.obtenerPedidoId(pedidoId);
     }

@@ -65,6 +65,9 @@ public class Pedido {
         this.totalPrecio = carrito.getTotalPrecio();
     }
 
+    public Pedido() {
+    }
+
     public long getId_pedido() {
         return id;
     }

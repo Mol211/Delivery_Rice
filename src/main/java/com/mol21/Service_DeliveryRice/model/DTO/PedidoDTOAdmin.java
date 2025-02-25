@@ -28,7 +28,7 @@ public class PedidoDTOAdmin {
         this.metodoPago = pedido.getMetodoPago();
         this.listaDetalles = pedidosDTOS;
         this.usuario = new UsuarioDTO(pedido.getUsuario());
-        this.repartidor = new UsuarioDTO(pedido.getRepartidor());
+        this.repartidor = (pedido.getRepartidor()!=null) ? new UsuarioDTO(pedido.getRepartidor()) : null;
         this.fechaCreacion = pedido.getFechaCreacion();
     }
 
@@ -41,7 +41,7 @@ public class PedidoDTOAdmin {
         this.metodoPago = pedido.getMetodoPago();
         this.usuario = new UsuarioDTO(pedido.getUsuario());
         this.fechaCreacion = pedido.getFechaCreacion();
-        this.repartidor = new UsuarioDTO(pedido.getRepartidor());
+        this.repartidor = (pedido.getRepartidor()!=null) ? new UsuarioDTO(pedido.getRepartidor()) : null;
     }
 
     public long getId() {
@@ -97,5 +97,29 @@ public class PedidoDTOAdmin {
     }
     public void setRepartidor(UsuarioDTO repartidor) {
         this.repartidor = repartidor;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public DireccionDTO getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(DireccionDTO direccion) {
+        this.direccion = direccion;
+    }
+
+    public UsuarioDTO getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioDTO usuario) {
+        this.usuario = usuario;
     }
 }

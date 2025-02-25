@@ -24,18 +24,20 @@ public class CheckoutController {
     public GenericResponse<List<PedidoDTOAdmin>> obtenerPedidos(
             @RequestParam(value = "idUsuario", required = false) Long idUsuario,
             @RequestParam(value = "idRepartidor", required = false) Long idRepartidor,
-            @RequestParam(value = "estadp", required = false) EstadoPedido estado) {
+            @RequestParam(value = "estado", required = false) EstadoPedido estado) {
         return checkoutService.obtenerPedidos(idUsuario, idRepartidor, estado);
     }
-    @GetMapping("/pedido")
+    @GetMapping("/pedido/{idPedido}")
     public GenericResponse<PedidoDTOAdmin> obtenerUnPedido(@PathVariable ("idPedido") long idPedido){
         return checkoutService.obtenerPedido(idPedido);
     }
-    @PutMapping()
-
+    @PutMapping("/cambio-estado/{idPedido}")
+    public GenericResponse<PedidoDTOAdmin> cambiarEstado(
+            @PathVariable ("idPedido") Long idPedido,
+            @RequestParam (value = "accion", required = true) String accion,
+            //preparar, enviar, cancelar, completar
+            @RequestParam (value = "idRepartidor", required = false) Long idRepartidor){
+        return checkoutService.cambiarEstado(idPedido,accion,idRepartidor);
+    }
 }
 
-
-    //Asignar un pedido a un repartidor
-
-//}

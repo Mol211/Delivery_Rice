@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class UsuarioDTO {
 
-    private long id;
+    private Long id;
     private String email;
     private String nombre;
     private String apellido;
@@ -16,15 +16,21 @@ public class UsuarioDTO {
 
 
     public UsuarioDTO(Usuario usuario){
-        this.id = usuario.get_id();
-        this.email = usuario.getEmail();
-        this.nombre = usuario.getNombre();
-        this.apellido = usuario.getApellido();
-        this.rol = usuario.getRol();
-        this.telefono = usuario.getTelefono();
+        if(usuario != null) {
+            this.id = usuario.get_id();
+            this.email = usuario.getEmail();
+            this.nombre = usuario.getNombre();
+            this.apellido = usuario.getApellido();
+            this.rol = usuario.getRol();
+            this.telefono = usuario.getTelefono();
+        } else {
+            this.id = null;
+            this.nombre = "Desconocido";
+            this.email = "Sin email";
+        }
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
