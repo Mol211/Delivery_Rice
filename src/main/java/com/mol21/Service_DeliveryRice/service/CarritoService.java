@@ -6,8 +6,10 @@ import com.mol21.Service_DeliveryRice.persistence.*;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -21,7 +23,7 @@ public class CarritoService {
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
 
-    public CarritoService(CarritoRepository carritoRepository, ProductoRepository productoRepository, UsuarioRepository usuarioRepository, DireccionRepository direccionRepository, DetalleRepository detalleRepository, PedidoRepository pedidoRepository){
+    public CarritoService(CarritoRepository carritoRepository, ProductoRepository productoRepository, UsuarioRepository usuarioRepository, DireccionRepository direccionRepository, DetalleRepository detalleRepository, PedidoRepository pedidoRepository) {
         this.carritoRepository = carritoRepository;
         this.usuarioRepository = usuarioRepository;
         this.direccionRepository = direccionRepository;
@@ -41,28 +43,31 @@ public class CarritoService {
     //      Si null. No encuentra carrito
 
     //1.- Crear nuevo Carrito
-    public GenericResponse<CarritoDTO> nuevoCarrito(long idUsuario){
+    public GenericResponse<CarritoDTO> nuevoCarrito(long idUsuario) {
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
-        if(optU.isPresent()){
+        if (optU.isPresent()) {
             Usuario usuario = optU.get();
             //Tiene que saber si existe un carrito que no esté procesado porque no puede tener más de un carrito procesado
-            Optional <Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
-            if(!optC.isPresent()){
+            Optional<Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
+            if (!optC.isPresent()) {
                 Carrito carrito = new Carrito();
                 carrito.setUsuario(optU.get());
                 carrito.setTotalPrecio(BigDecimal.ZERO);
                 carritoRepository.save(carrito);
+                System.out.println("El id del carrito es: " + carrito.getCarrito_id());
+                ArrayList<ItemDTO>listaVacia = new ArrayList<>();
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
                         "Se ha creado un nuevo carrito",
-                        new CarritoDTO(carrito));
+                        new CarritoDTO(carrito,listaVacia));
             }
             //Si tiene un carrito que no esté procesado no puede crear un nuevo carrito hasta que lo descarte o lo procese.
-            else{
+            else {
+                System.out.println("EP!");
                 Carrito carrito = optC.get();
 
-                        return new GenericResponse<>(
+                return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
                         "No se puede crear un nuevo carrito mientras tengas uno activo",
@@ -96,11 +101,12 @@ public class CarritoService {
                     carrito.setTotalProductos(0);
                     carrito.setTotalPrecio(BigDecimal.ZERO);
                     carritoRepository.save(carrito);
+                    ArrayList<ItemDTO>listaVacia = new ArrayList<>();
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "Se ha vaciado el carrito",
-                            new CarritoDTO(carrito)
+                            new CarritoDTO(carrito, listaVacia)
                     );
                 } else {
                     return new GenericResponse<>(
@@ -115,7 +121,7 @@ public class CarritoService {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
-                        "No existe ese Producto",
+                        "No existe ese Carrito",
                         null
                 );
             }
@@ -129,86 +135,101 @@ public class CarritoService {
         }
     }
 
-    //3.- Obtener el ID del carrito sin procesar
-    public GenericResponse<Long> obtenerIdCarritoSinProcesar(long idUsuario) {
+ //3.- Obtener el ID del carrito sin procesar
+//    public GenericResponse<CarritoDTO> obtenerIdCarritoSinProcesar(long idUsuario) {
+//        Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
+//        if (optU.isPresent()) {
+//            Usuario usuario = optU.get();
+//            Optional<Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
+//            if (optC.isPresent()) {
+//                Carrito carritoSinProcesar = optC.get();
+//                return new GenericResponse<>(
+//                        TIPO_DATA,
+//                        RPTA_OK,
+//                        String.valueOf("carritoSinProcesar.getCarrito_id()"),
+//                        obtenerCarritoDTO(carritoSinProcesar)
+//                );
+//
+//            } else {
+//                return new GenericResponse<>(
+//                        TIPO_DATA,
+//                        RPTA_WARNING,
+//                        "Actualmente no tiene ningún carrito activo",
+//                        null
+//                );
+//            }
+//        } else {
+//            return new GenericResponse<>(
+//                    TIPO_DATA,
+//                    RPTA_ERROR,
+//                    "No se encuentra el usuario",
+//                    null
+//            );
+//        }
+//    }
+
+    //4.- Obtener le carrito
+    public GenericResponse<CarritoDTO> obtenerCarrito(long idUsuario) {
+        //Se busca el usuario
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
         if (optU.isPresent()) {
             Usuario usuario = optU.get();
+            //Si el usurio existe se busca carrito sin procesar
             Optional<Carrito> optC = carritoRepository.findByUsuarioAndProcesadoFalse(usuario);
-            if (optC.isPresent()) {
-                Carrito carritoSinProcesar = optC.get();
+            if(optC.isPresent()){
+                Carrito c = optC.get();
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
-                        "Se ha obtenido el id del carrito sin Procesar",
-                        carritoSinProcesar.getCarrito_id()
+                        "Se ha obtenido el carrito sin procesar",
+                        obtenerCarritoDTO(c)
                 );
-
-            } else {
+            } else{
                 return new GenericResponse<>(
                         TIPO_DATA,
-                        RPTA_WARNING,
-                        "Actualmente no tiene ningún carrito activo",
+                        RPTA_OK,
+                        "No tiene carrito activo",
                         null
                 );
             }
-        }else{
+        } else {
             return new GenericResponse<>(
                     TIPO_DATA,
-                    RPTA_ERROR,
+                    RPTA_WARNING,
                     "No se encuentra el usuario",
                     null
             );
         }
     }
 
-    //4.- Obtener le carrito
-    public GenericResponse<CarritoDTO>obtenerCarrito(long idCarrito){
-        Optional<Carrito> optC = carritoRepository.findById(idCarrito);
-        if(optC.isPresent()){
-            Carrito carrito = optC.get();
-            return new GenericResponse<>(
-                    TIPO_DATA,
-                    RPTA_OK,
-                    "Se ha obtenido el carrito",
-                    obtenerCarritoDTO(carrito));
-        } else{
-            return new GenericResponse<>(
-                    TIPO_DATA,
-                    RPTA_WARNING,
-                    "No se encuentra el Carrito introducido",
-                    null
-            );
-        }
-    }
 
     //5.- Validar Carrito
-    public GenericResponse<Map<ItemDTO, Integer>>validarCarrito(long idCarrito){
+    public GenericResponse<Map<ItemDTO, Integer>> validarCarrito(long idCarrito) {
         Optional<Carrito> optC = carritoRepository.findById(idCarrito);
-        if(optC.isPresent()){
+        if (optC.isPresent()) {
             Carrito carrito = optC.get();
             carrito.Items();
-            Map<ItemDTO, Integer> ItemsCarrito= new HashMap();
-            for(ItemCarrito item : carrito.Items()){
+            Map<ItemDTO, Integer> ItemsCarrito = new HashMap();
+            for (ItemCarrito item : carrito.Items()) {
                 int stockItem = item.getProducto().getStock();
                 int cantidadItem = item.getCantidad();
                 int exceso = cantidadItem - stockItem;
-                if(exceso>0){
+                if (exceso > 0) {
                     ItemsCarrito.put(new ItemDTO(item), exceso);
-                }else{
-                    ItemsCarrito.put(new ItemDTO(item),0);
+                } else {
+                    ItemsCarrito.put(new ItemDTO(item), 0);
                 }
             }
             if (!ItemsCarrito.isEmpty()) {
                 boolean tieneExceso = false;
                 //Recorremos los valores del mapa buscando numero diferente de cero (falta de stock)
-                for(Integer exceso : ItemsCarrito.values()){
-                    if(exceso > 0){
+                for (Integer exceso : ItemsCarrito.values()) {
+                    if (exceso > 0) {
                         tieneExceso = true;
                         break;
                     }
                 }
-                if(tieneExceso){
+                if (tieneExceso) {
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_WARNING,
@@ -216,15 +237,14 @@ public class CarritoService {
                                     ", retírelos del carrito para continuar",
                             ItemsCarrito
                     );
-                } else{
+                } else {
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "El carrito puede procesarse, no sobrepasa el stock de los productos",
                             ItemsCarrito);
                 }
-            }
-            else {
+            } else {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
@@ -241,44 +261,43 @@ public class CarritoService {
             );
         }
     }
+
     //7.- Procesar Pedido
-    public GenericResponse<Object> procesarPedido(long idCarrito, MetodoPago metodoPago, long idDireccion){
+    public GenericResponse<Object> procesarPedido(long idCarrito, MetodoPago metodoPago, long idDireccion) {
         Optional<Carrito> optC = carritoRepository.findById(idCarrito);
         Optional<Direccion> optD = direccionRepository.findById(idDireccion);
-        if(!optD.isPresent()){
+        if (!optD.isPresent()) {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
                     "No se ha encontrado la dirección",
                     null
             );
-        }
-        else if(!optC.isPresent()){
+        } else if (!optC.isPresent()) {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
                     "No se ha encontrado el carrito",
                     null
             );
-        }
-        else{
+        } else {
             Carrito carrito = optC.get();
             Direccion direccion = optD.get();
             GenericResponse<Map<ItemDTO, Integer>> resultadoValidacion = validarCarrito(carrito.getCarrito_id());
             //SI validar no devuelve RPTA OK enviamos el resultado de validar
-            if(resultadoValidacion.getRpta() != RPTA_OK) {
+            if (resultadoValidacion.getRpta() != RPTA_OK) {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_WARNING,
                         resultadoValidacion.getMessage(),
                         resultadoValidacion.getBody());
-            }else{
+            } else {
                 //Si Validar is RPTA_OK Carrito está validado
                 //Creamos un nuevo pedido y actualizamos el stock del almacen
                 Pedido pedido = new Pedido(carrito, direccion, metodoPago);
                 //Cada Item se transforma en un detalle del pedido
                 List<DetallePedido> detallePedidoList = new ArrayList<>();
-                for(ItemCarrito item : carrito.Items()) {
+                for (ItemCarrito item : carrito.Items()) {
                     DetallePedido detalle = new DetallePedido();
                     detalle.setPedido(pedido);
                     detalle.setCantidad(item.getCantidad());
@@ -299,8 +318,8 @@ public class CarritoService {
                 carritoRepository.save(carrito);
                 nuevoCarrito(carrito.getUsuario().get_id());
 
-                List<DetalleDTO>listaDetallesDTOS = new ArrayList<>();
-                for(DetallePedido detalle : detallePedidoList){
+                List<DetalleDTO> listaDetallesDTOS = new ArrayList<>();
+                for (DetallePedido detalle : detallePedidoList) {
                     listaDetallesDTOS.add(new DetalleDTO(detalle));
                 }
                 return new GenericResponse(
@@ -312,13 +331,14 @@ public class CarritoService {
             }
         }
     }
+
     //Obtener CarritoDTO
     private CarritoDTO obtenerCarritoDTO(Carrito carrito) {
         ArrayList<ItemDTO> listaDTOS = new ArrayList<>();
         for (ItemCarrito i : carrito.Items()) {
             listaDTOS.add(new ItemDTO(i));
         }
-        return new CarritoDTO(carrito,listaDTOS);
+        return new CarritoDTO(carrito, listaDTOS);
     }
 
 }

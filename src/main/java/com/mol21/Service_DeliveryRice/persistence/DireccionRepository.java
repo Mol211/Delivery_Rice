@@ -22,4 +22,6 @@ public interface DireccionRepository extends CrudRepository<Direccion, Long> {
     void resetPrincipal(@Param("usuarioId") long usuarioId);
 
     Optional<Direccion> findByUsuarioAndCalleAndNumeroAndCiudadAndCodPostal(Usuario usuario, String calle, String numero, String ciudad, String codPostal);
+
+    List<Direccion> findByUsuario_idAndEsActivaTrue(long usuarioId);
 }

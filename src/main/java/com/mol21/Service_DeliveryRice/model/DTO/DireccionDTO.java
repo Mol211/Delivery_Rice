@@ -10,6 +10,7 @@ public class DireccionDTO {
     private String ciudad;
     private boolean esPrincipal;
     private String emailUsuario;
+    private boolean esActiva;
     //De momento dejo el email, pero no me sirve para nada
 
 
@@ -72,6 +73,14 @@ public class DireccionDTO {
     public DireccionDTO() {
     }
 
+    public boolean isEsActiva() {
+        return esActiva;
+    }
+
+    public void setEsActiva(boolean esActiva) {
+        this.esActiva = esActiva;
+    }
+
     public DireccionDTO(Direccion direccion) {
         this.id = direccion.getDireccion_id();
         this.calle = direccion.getCalle();
@@ -79,5 +88,6 @@ public class DireccionDTO {
         this.ciudad = direccion.getCiudad();
         this.codPostal = direccion.getCodPostal();
         this.esPrincipal = direccion.isEsPrincipal();
+        this.esActiva = direccion.isEsActiva();
     }
 }

@@ -30,10 +30,38 @@ public class Direccion {
     @Column(nullable = false)
     private boolean esPrincipal;
 
+    public boolean isEsActiva() {
+        return esActiva;
+    }
+
+    public void setEsActiva(boolean esActiva) {
+        this.esActiva = esActiva;
+    }
+
+    @Column(nullable = false)
+    private boolean esActiva = true;
+
+
+
     @CreationTimestamp
     @Column(nullable = false)
     LocalDateTime fechaCreacion;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Pedido> getLista_pedidos() {
+        return lista_pedidos;
+    }
+
+    public void setLista_pedidos(List<Pedido> lista_pedidos) {
+        this.lista_pedidos = lista_pedidos;
+    }
 
     @ManyToOne
     @JsonIgnore

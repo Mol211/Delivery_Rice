@@ -22,12 +22,12 @@ public class ItemController {
     }
 
     @PostMapping("/agregar")
-    public GenericResponse<CarritoDTO> addItem(@RequestParam long idCarrito, @RequestParam long idProducto, @RequestParam int cantidad){
+    public GenericResponse<ItemDTO> addItem(@RequestParam long idCarrito, @RequestParam long idProducto, @RequestParam int cantidad){
         return service.addItemsToCarrito(idCarrito, idProducto, cantidad);
     }
 
     @PutMapping("/modificar/{itemId}")
-    public GenericResponse<CarritoDTO> modificarItem(@PathVariable long itemId, @RequestParam int cantidad
+    public GenericResponse<ItemDTO> modificarItem(@PathVariable long itemId, @RequestParam int cantidad
     ){
         return service.modificarCantidad( itemId,  cantidad);
     }

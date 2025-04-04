@@ -14,6 +14,8 @@ public class DetalleDTO {
     private long idProducto;
     private String nombreProducto;
     private BigDecimal precioUnitario;
+    private String descripcionProducto;
+    private String imagen;
 
 
 
@@ -24,6 +26,24 @@ public class DetalleDTO {
         this.subTotal = detalle.getSubTotal();
         this.precioUnitario = detalle.getPrecioUnitario();
         this.idProducto = detalle.getProducto().getId_product();
+        this.descripcionProducto = detalle.getProducto().getDescripcion();
+        this.imagen = detalle.getProducto().getImagenUrl();
+    }
+
+    public String getDescripcionProducto() {
+        return descripcionProducto;
+    }
+
+    public void setDescripcionProducto(String descripcionProducto) {
+        this.descripcionProducto = descripcionProducto;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 
     public void setId(long id) {

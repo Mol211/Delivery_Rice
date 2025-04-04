@@ -41,21 +41,14 @@ public class DireccionController {
         return this.service.guardarDireccion(idUsuario, d);
     }
 
-    @PutMapping("/{id}")
-    public GenericResponse<DireccionDTO> actualizarDireccion(@PathVariable Long id, @RequestBody Direccion d){
-        if(d.getDireccion_id()!=null && !d.getDireccion_id().equals(id)) {
-            return new GenericResponse<>(TIPO_AUTH,
-                    RPTA_ERROR,
-                    "Los IDs de la URL y del cuerpo del JSON no coinciden",
-                    null);
-        }
-        d.setDireccion_id(id);
+    @PutMapping("/actualizar")
+    public GenericResponse<DireccionDTO> actualizarDireccion(@RequestBody Direccion d){
         return service.modificarDireccion(d);
     }
 
     @DeleteMapping("/{id}")
-    public GenericResponse<Void> eliminarDireccion(@PathVariable Long id){
-        return service.eliminarDireccion(id);
+    public GenericResponse<DireccionDTO> eliminarDireccion(@PathVariable Long id){
+        return service.desactivarDireccion(id);
     }
 
     @DeleteMapping("/delete")

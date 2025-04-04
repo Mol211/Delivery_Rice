@@ -1,6 +1,8 @@
 package com.mol21.Service_DeliveryRice.controller;
 
+import com.mol21.Service_DeliveryRice.model.DTO.RegistrarUsuarioDTO;
 import com.mol21.Service_DeliveryRice.model.DTO.UsuarioDTO;
+import com.mol21.Service_DeliveryRice.model.Direccion;
 import com.mol21.Service_DeliveryRice.model.Usuario;
 import com.mol21.Service_DeliveryRice.service.UsuarioService;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
@@ -25,16 +27,14 @@ public class UsuarioController {
         return usuarioService.login(email, password);
     }
     @PostMapping("/cliente")
-    public GenericResponse<UsuarioDTO> registrarCliente(@RequestBody Usuario u){
-        System.out.println("Nombre recibido: " + u.getNombre()+
-        "id recibido: "+u.get_id());// Debug
-        return this.usuarioService.registrarCliente(u);
+    public GenericResponse<UsuarioDTO> registrarCliente(@RequestBody RegistrarUsuarioDTO regUsuarioDTO){
+        return this.usuarioService.registrarCliente(regUsuarioDTO);
     }
 
 
     @PostMapping("/repartidor")
-    public GenericResponse<UsuarioDTO> registrarRepartidor(@RequestBody Usuario u){
-        return usuarioService.registrarRepartidor(u);
+    public GenericResponse<UsuarioDTO> registrarRepartidor(@RequestBody RegistrarUsuarioDTO regUsuarioDTO){
+        return usuarioService.registrarRepartidor(regUsuarioDTO);
     }
 
     @PutMapping("/{id}")

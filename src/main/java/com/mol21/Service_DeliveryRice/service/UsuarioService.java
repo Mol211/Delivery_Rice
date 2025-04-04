@@ -1,8 +1,11 @@
 package com.mol21.Service_DeliveryRice.service;
 
+import com.mol21.Service_DeliveryRice.model.DTO.RegistrarUsuarioDTO;
 import com.mol21.Service_DeliveryRice.model.DTO.UsuarioDTO;
+import com.mol21.Service_DeliveryRice.model.Direccion;
 import com.mol21.Service_DeliveryRice.model.Rol;
 import com.mol21.Service_DeliveryRice.model.Usuario;
+import com.mol21.Service_DeliveryRice.persistence.DireccionRepository;
 import com.mol21.Service_DeliveryRice.persistence.UsuarioRepository;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import jakarta.transaction.Transactional;
@@ -17,18 +20,21 @@ import static com.mol21.Service_DeliveryRice.model.Rol.*;
 @Transactional
 public class UsuarioService {
 
-    private final UsuarioRepository repository;
+    private final UsuarioRepository usuarioRepository;
+    private final DireccionRepository direccionRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
-        this.repository = repository;
+    public UsuarioService(UsuarioRepository usuarioRepository, DireccionRepository direccionRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository
+        ;
+        this.direccionRepository = direccionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     //El administrador debe tener un metodo para listar usuarios y otro para clientes
     //Registrar un usuario
-    private GenericResponse<UsuarioDTO> registrarUsuario(Usuario u, Rol rol) {
-        if (repository.existsByEmail(u.getEmail())) {
+    private GenericResponse<UsuarioDTO> registrarUsuario(RegistrarUsuarioDTO regUsuario, Rol rol) {
+        if (usuarioRepository.existsByEmail(regUsuario.getU().getEmail())) {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
@@ -36,20 +42,20 @@ public class UsuarioService {
                     null
             );
         }
-        return crearUsuario(u, rol);
+        return crearUsuario(regUsuario, rol);
     }
     //Registramos un Cliente
-    public GenericResponse<UsuarioDTO> registrarCliente(Usuario u) {
-        return registrarUsuario(u, CLIENTE);
+    public GenericResponse<UsuarioDTO> registrarCliente(RegistrarUsuarioDTO registrarUsuarioDTO) {
+        return registrarUsuario(registrarUsuarioDTO, CLIENTE);
     }
     //Registramos un Repartidor
-    public GenericResponse<UsuarioDTO> registrarRepartidor(Usuario u) {
-        return registrarUsuario(u, REPARTIDOR);
+    public GenericResponse<UsuarioDTO> registrarRepartidor(RegistrarUsuarioDTO registrarUsuarioDTO) {
+        return registrarUsuario(registrarUsuarioDTO, REPARTIDOR);
     }
 
     //Crear un usuario si no existe el Email en la BD
-    public GenericResponse<UsuarioDTO> crearUsuario(Usuario u, Rol rol) {
-        if (repository.existsByEmail(u.getEmail())) {
+    public GenericResponse<UsuarioDTO> crearUsuario(RegistrarUsuarioDTO regUsuario, Rol rol) {
+        if (usuarioRepository.existsByEmail(regUsuario.getU().getEmail())) {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
@@ -57,9 +63,12 @@ public class UsuarioService {
                     null
             );
         } else {
-            u.setRol(rol);
-            u.setPassword(passwordEncoder.encode(u.getPassword()));
-            UsuarioDTO usuarioDto = new UsuarioDTO(repository.save(u));
+
+            regUsuario.getU().setRol(rol);
+            regUsuario.getU().setPassword(passwordEncoder.encode(regUsuario.getU().getPassword()));
+            UsuarioDTO usuarioDto = new UsuarioDTO(usuarioRepository.save(regUsuario.getU()));
+            regUsuario.getD().setUsuario(regUsuario.getU());
+            direccionRepository.save(regUsuario.getD());
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_OK,
@@ -72,7 +81,7 @@ public class UsuarioService {
 
    //Login de usuario
     public GenericResponse<UsuarioDTO> login(String email, String password) {
-        Optional<Usuario> optU = repository.findByEmail(email);
+        Optional<Usuario> optU = usuarioRepository.findByEmail(email);
         //Optional<Usuario> usuarioOptional = repository.login(email, password);
         if (optU.isPresent()) {
             //Si usuario existe se instancia
@@ -110,10 +119,10 @@ public class UsuarioService {
 
     //El cliente puede modificar sus datos
     public GenericResponse<UsuarioDTO> modificarCliente(long id, Usuario u) {
-        Optional<Usuario> optU = repository.findById(id);
+        Optional<Usuario> optU = usuarioRepository.findById(id);
         if (optU.isPresent()) {
             Usuario usuarioExistente = optU.get();
-            if (repository.existsByEmail(u.getEmail()) && (!u.getEmail().equals(usuarioExistente.getEmail()))) {
+            if (usuarioRepository.existsByEmail(u.getEmail()) && (!u.getEmail().equals(usuarioExistente.getEmail()))) {
                 return new GenericResponse<>(
                         Global.TIPO_AUTH,
                         Global.RPTA_WARNING,
@@ -133,7 +142,7 @@ public class UsuarioService {
                         Global.TIPO_AUTH,
                         Global.RPTA_OK,
                         "Se han actualizado los datos del usuario " + usuarioExistente.get_id(),
-                        new UsuarioDTO(repository.save(usuarioExistente))
+                        new UsuarioDTO(usuarioRepository.save(usuarioExistente))
                 );
             }
 

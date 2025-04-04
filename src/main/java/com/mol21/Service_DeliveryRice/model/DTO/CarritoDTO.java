@@ -12,19 +12,13 @@ public class CarritoDTO {
     private int totalProductos;
     private List<ItemDTO> listaItems;
     private boolean esProcesado;
+
     public CarritoDTO(Carrito carrito, ArrayList<ItemDTO> listaDTOS) {
         this.id = carrito.getCarrito_id();
         this.totalProductos = carrito.getTotalProductos();
         this.precioCarrito = carrito.getTotalPrecio();
         this.esProcesado = carrito.isProcesado();
         this.listaItems = listaDTOS;
-    }
-
-    public CarritoDTO(Carrito carrito) {
-        this.id = carrito.getCarrito_id();
-        this.totalProductos = carrito.getTotalProductos();
-        this.precioCarrito = carrito.getTotalPrecio();
-        this.esProcesado = carrito.isProcesado();
     }
 
     public long getId() {

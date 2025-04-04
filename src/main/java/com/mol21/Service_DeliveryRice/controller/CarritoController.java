@@ -23,9 +23,9 @@ public class CarritoController {
 
         this.itemService = itemService;
     }
-    @GetMapping("/{id}")
-    public GenericResponse<CarritoDTO> obtenerCarrito(@PathVariable long id){
-        return carritoService.obtenerCarrito(id);
+    @GetMapping("/{idUsuario}")
+    public GenericResponse<CarritoDTO> obtenerCarrito(@PathVariable long idUsuario){
+        return carritoService.obtenerCarrito(idUsuario);
     }
     @PostMapping("/usuario/{idUsuario}")
     public GenericResponse<CarritoDTO> nuevoCarrito(@PathVariable long idUsuario){
@@ -34,10 +34,6 @@ public class CarritoController {
     @PostMapping("vaciar-carrito/usuario/{idUsuario}")
         public GenericResponse<CarritoDTO> vaciarCarrito(@PathVariable long idUsuario){
             return carritoService.vaciarCarrito(idUsuario);
-    }
-    @GetMapping("/id-carrito/usuario/{idUsuario}")
-    public GenericResponse<Long> obtenerIdCarritoSinProcesar(@PathVariable long idUsuario){
-        return carritoService.obtenerIdCarritoSinProcesar(idUsuario);
     }
     @PostMapping("/procesar/{idCarrito}")
     public GenericResponse<Object> procesarCarrito(@PathVariable long idCarrito, @RequestParam MetodoPago metodoPago, @RequestParam long idDireccion){

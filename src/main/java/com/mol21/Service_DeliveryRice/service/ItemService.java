@@ -82,7 +82,7 @@ public class ItemService {
 
     }
     //2.- Agregar Item a Carrito
-    public GenericResponse<CarritoDTO> addItemsToCarrito(long carritoId, long productoID, int cantidad) {
+    public GenericResponse<ItemDTO> addItemsToCarrito(long carritoId, long productoID, int cantidad) {
         Optional<Producto> optP = productoRepository.findById(productoID);
         Optional<Carrito> optC = carritoRepository.findById(carritoId);
         //Nos cercioramos que existan ese producto y ese carrito
@@ -103,25 +103,27 @@ public class ItemService {
                         CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
                         return new GenericResponse<>(
                                 TIPO_DATA,
-                                RPTA_OK,
+                                RPTA_WARNING,
                                 "Se ha eliminado el ItemCarrito ",
-                                carritoDTO
+                                null
                         );
                     }
                     //Si la cantidad no menor que Cero actualiza la cantidad,el precio del Carrito y la cantidad de productos.
                     else {
+                        carrito.Items().remove(item);
                         item.setCantidad(nuevaCantidad);
+                        carrito.Items().add(item);
                         carrito.setTotalProductos(carrito.getTotalProductos() + cantidad);
                         carrito.setTotalPrecio(carrito.getTotalPrecio().add(producto.getPrecio().multiply(BigDecimal.valueOf(cantidad))));
                         //Actualizamos BD
                         carritoRepository.save(carrito);
                         itemRepository.save(item);
-                        CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
+                        System.out.println(item.toString());
                         return new GenericResponse<>(
                                 TIPO_DATA,
                                 RPTA_OK,
                                 "Producto modificado",
-                                carritoDTO
+                                new ItemDTO(item)
                         );
                     }
                 }
@@ -132,23 +134,25 @@ public class ItemService {
                         itemRepository.save(item);
 
                         //Actualizamos el carrito cada vez que añadimos un item a la BD y el stock del Producto
+                        carrito.Items().add(item);
                         carrito.setTotalProductos(carrito.getTotalProductos() + cantidad);
                         carrito.setTotalPrecio(carrito.getTotalPrecio().add(item.getSubTotal()));
                         carritoRepository.save(carrito);
                         CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
+                        System.out.println(itemRepository.findByCarrito(carrito).size());
                         //Devolvemos la respuesta con el itemDTO
                         return new GenericResponse<>(
                                 TIPO_DATA,
                                 RPTA_OK,
                                 "Producto agregado al carrito",
-                                carritoDTO
+                                new ItemDTO(item)
                         );
 
 
                     } else {
                         return new GenericResponse<>(
                                 TIPO_DATA,
-                                RPTA_WARNING,
+                                RPTA_ERROR,
                                 "No puedes introducir una cantidad negativa",
                                 null);
                     }
@@ -156,7 +160,7 @@ public class ItemService {
             }else{
                 return new GenericResponse<>(
                         TIPO_DATA,
-                        RPTA_WARNING,
+                        RPTA_ERROR,
                         "Ese carrito ya ha sido procesado",
                         null);
             }
@@ -164,14 +168,14 @@ public class ItemService {
         } else {
             return new GenericResponse<>(
                     TIPO_DATA,
-                    RPTA_WARNING,
+                    RPTA_ERROR,
                     "Carrito o Producto no válidos",
                     null
             );
         }
     }
     //3.- ActualizarItem
-    public GenericResponse<CarritoDTO> modificarCantidad(long itemId, int cantidad) {
+    public GenericResponse<ItemDTO> modificarCantidad(long itemId, int cantidad) {
         Optional<ItemCarrito> optI = itemRepository.findById(itemId);
 
         if (optI.isPresent()) {
@@ -199,15 +203,11 @@ public class ItemService {
                     itemRepository.save(item);
                     carritoRepository.save(carrito);
 
-                    //Creamos lista de items del carrito y creamos lista de ItemsDTO
-                    CarritoDTO carritoDTO = obtenerCarritoDTO(carrito);
-
-
                     return new GenericResponse<>(
                             TIPO_DATA,
                             RPTA_OK,
                             "Carrito actualizado con éxito",
-                            carritoDTO
+                            new ItemDTO(item)
                     );
 
                 } else {
@@ -220,13 +220,13 @@ public class ItemService {
                             TIPO_DATA,
                             RPTA_WARNING,
                             "Item eliminado del carrito",
-                            carritoDTO
+                            null
                     );
                 }
             }else{
                 return new GenericResponse<>(
                         TIPO_DATA,
-                        RPTA_WARNING,
+                        RPTA_ERROR,
                         "Ese carrito ya ha sido procesado",
                         null
                 );
@@ -235,7 +235,7 @@ public class ItemService {
         } else {
             return new GenericResponse<>(
                     TIPO_DATA,
-                    RPTA_WARNING,
+                    RPTA_ERROR,
                     "No existe ese Producto",
                     null
             );

@@ -10,8 +10,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -90,8 +92,8 @@ public class ProductoService {
     }
 
     //3.- Modificar Producto
-    public GenericResponse<ProductoDTO> modificarProducto(Producto p){
-        Optional<Producto> optP =repository.findById(p.getId_product());
+    public GenericResponse<ProductoDTO> modificarProducto(long id, Map<String,Object> updates){
+        Optional<Producto> optP =repository.findById(id);
         if(!optP.isPresent()){
             return new GenericResponse<>(
                     TIPO_DATA,
@@ -100,12 +102,47 @@ public class ProductoService {
                     null
             );
         } else {
-            return new GenericResponse<>(
-                    TIPO_DATA,
-                    RPTA_OK,
-                    "Producto modifcado con éxito",
-                    new ProductoDTO(repository.save(p))
-            );
+            Producto p = optP.get();
+            try{
+                updates.forEach((campo,valor) ->{
+                    switch (campo){
+                        case "nombre":
+                            p.setNombre((String) valor);
+                            break;
+                        case"stock":
+                            p.setStock((Integer) valor);
+                            break;
+                        case"categoria_producto":
+                            p.setCategoriaProducto((CategoriaProducto) valor);
+                            break;
+                        case"descripcion":
+                            p.setDescripcion((String) valor);
+                            break;
+                        case"imagen_url":
+                            p.setImagenUrl((String) valor);
+                            break;
+                        case"precio":
+                            p.setPrecio((BigDecimal) valor);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Campo no válido: " + campo);
+                    }
+                });
+
+                return new GenericResponse<>(
+                        TIPO_DATA,
+                        RPTA_OK,
+                        "Producto modifcado con éxito",
+                        new ProductoDTO(repository.save(p))
+                );
+            }catch(IllegalArgumentException e){
+                return new GenericResponse<>(
+                        TIPO_EX,
+                        RPTA_ERROR,
+                        e.getMessage(),
+                        null
+                );
+            }
         }
     }
 

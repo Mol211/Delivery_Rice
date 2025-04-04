@@ -9,6 +9,7 @@ import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.mol21.Service_DeliveryRice.utils.Global.RPTA_ERROR;
 import static com.mol21.Service_DeliveryRice.utils.Global.TIPO_AUTH;
@@ -28,7 +29,7 @@ public class ProductoController {
     }
 
     @GetMapping("/categoria/{categoria}")
-    public GenericResponse<List> obtenerProductos(@PathVariable CategoriaProducto categoria){
+    public GenericResponse<List>obtenerProductos(@PathVariable CategoriaProducto categoria){
         return service.getProductByCategory(categoria);
     }
 
@@ -39,16 +40,11 @@ public class ProductoController {
     }
 
 
-    @PutMapping("/{id}")
-    public GenericResponse<ProductoDTO> modificarProducto(@PathVariable long id, @RequestBody Producto p){
-        if(p.getId_product()!=0 && p.getId_product()!=id) {
-            return new GenericResponse<>(TIPO_AUTH,
-                    RPTA_ERROR,
-                    "Los IDs de la URL y del cuerpo del JSON no coinciden",
-                    null);
-        }
-        p.setId_product(id);
-        return service.modificarProducto(p);
+    @PatchMapping("/{id}")
+    public GenericResponse<ProductoDTO> modificarProducto
+            (@PathVariable long id, @RequestBody Map<String, Object> updates){
+
+        return service.modificarProducto(id, updates);
     }
 
     @DeleteMapping("/{id}")
