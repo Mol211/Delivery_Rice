@@ -1,8 +1,7 @@
 package com.mol21.Service_DeliveryRice.controller;
 
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTOAdmin;
+import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
 import com.mol21.Service_DeliveryRice.model.EstadoPedido;
-import com.mol21.Service_DeliveryRice.persistence.PedidoRepository;
 import com.mol21.Service_DeliveryRice.service.CheckoutService;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +20,18 @@ public class CheckoutController {
 
     //Obtener todos los pedidos(permite filtrado)
     @GetMapping()
-    public GenericResponse<List<PedidoDTOAdmin>> obtenerPedidos(
+    public GenericResponse<List<PedidoDTO>> obtenerPedidos(
             @RequestParam(value = "idUsuario", required = false) Long idUsuario,
             @RequestParam(value = "idRepartidor", required = false) Long idRepartidor,
             @RequestParam(value = "estado", required = false) EstadoPedido estado) {
         return checkoutService.obtenerPedidos(idUsuario, idRepartidor, estado);
     }
     @GetMapping("/pedido/{idPedido}")
-    public GenericResponse<PedidoDTOAdmin> obtenerUnPedido(@PathVariable ("idPedido") long idPedido){
+    public GenericResponse<PedidoDTO> obtenerUnPedido(@PathVariable ("idPedido") long idPedido){
         return checkoutService.obtenerPedido(idPedido);
     }
     @PutMapping("/cambio-estado/{idPedido}")
-    public GenericResponse<PedidoDTOAdmin> cambiarEstado(
+    public GenericResponse<PedidoDTO> cambiarEstado(
             @PathVariable ("idPedido") Long idPedido,
             @RequestParam (value = "accion", required = true) String accion,
             //preparar, enviar, cancelar, completar

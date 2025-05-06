@@ -51,11 +51,6 @@ public class DireccionController {
         return service.desactivarDireccion(id);
     }
 
-    @DeleteMapping("/delete")
-    public GenericResponse<Void> eliminarDirecciones(@RequestBody List<Long> ids){
-        return service.eliminarDirecciones(ids);
-    }
-
 
 
 }

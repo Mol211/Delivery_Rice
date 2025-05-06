@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -326,7 +325,7 @@ public class CarritoService {
                         TIPO_DATA,
                         RPTA_OK,
                         "Se ha procedo el carrito y se ha creado el pedido",
-                        new PedidoDTOCliente(pedido, listaDetallesDTOS)
+                        new PedidoDTO(pedido, listaDetallesDTOS)
                 );
             }
         }

@@ -2,7 +2,7 @@ package com.mol21.Service_DeliveryRice.service;
 
 import com.mol21.Service_DeliveryRice.model.*;
 import com.mol21.Service_DeliveryRice.model.DTO.DetalleDTO;
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTOAdmin;
+import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
 import com.mol21.Service_DeliveryRice.persistence.PedidoRepository;
 import com.mol21.Service_DeliveryRice.persistence.UsuarioRepository;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
@@ -34,7 +34,7 @@ public class CheckoutService{
     //6.- Completar Pedido
 
     //1.- Obtener todos los pedidos (ADMIN)
-    public GenericResponse<List<PedidoDTOAdmin>> obtenerPedidos(Long idUsuario, Long idRepartidor, EstadoPedido estadoPedido) {
+    public GenericResponse<List<PedidoDTO>> obtenerPedidos(Long idUsuario, Long idRepartidor, EstadoPedido estadoPedido) {
         List<Pedido>listaPedidos;
         String mensaje;
         Usuario usuario = null;
@@ -45,9 +45,6 @@ public class CheckoutService{
         if(idRepartidor != null){
             repartidor = usuarioRepository.findById(idRepartidor).orElse(null);
         }
-        Optional<Usuario> optU = (idUsuario!=null) ? usuarioRepository.findById(idUsuario) : Optional.empty();
-        Optional<Usuario> optR = (idRepartidor!=null) ? usuarioRepository.findById(idRepartidor) : Optional.empty();
-
         if(idUsuario != null && usuario == null){
             return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se ha encontrado el usuario", null);
         }if(idRepartidor!=null && repartidor == null){
@@ -91,16 +88,16 @@ public class CheckoutService{
                         ", del usuario "+
                         ", y con el estado ";
         }
-//        listaPedidos=pedidoRepository.findPedidosByFilters(usuario,repartidor,estadoPedido);
+
         return new GenericResponse<>(
                 TIPO_DATA,
                 RPTA_OK,
-                "mensaje",
+                mensaje,
                 crearListaPedidosDTO(listaPedidos)
         );
     }
     //2.- Obtener un pedido en específico(ADMIN)
-    public GenericResponse<PedidoDTOAdmin>obtenerPedido(long idPedido){
+    public GenericResponse<PedidoDTO>obtenerPedido(long idPedido){
         Optional<Pedido> optP = pedidoRepository.findById(idPedido);
         if(optP.isPresent()){
             return new GenericResponse<>(TIPO_DATA, RPTA_OK,"Se ha obtenido el pedido seleccionado",obtenerPedidoDto(optP.get()));
@@ -109,7 +106,7 @@ public class CheckoutService{
         }
     }
     //3.- Cambiar de estado un Pedido("preparar", "enviar","cancelar","completar")
-    public GenericResponse<PedidoDTOAdmin> cambiarEstado(Long idPedido, String accion, Long idRepartidor){
+    public GenericResponse<PedidoDTO> cambiarEstado(Long idPedido, String accion, Long idRepartidor){
         Optional<Usuario> optRep = (idRepartidor!=null) ? usuarioRepository.findById(idRepartidor) : Optional.empty();
         Optional<Pedido>optP = pedidoRepository.findById(idPedido);
         if(!optRep.isPresent() && idRepartidor!=null){
@@ -141,7 +138,7 @@ public class CheckoutService{
     }
 
     //Metodos para gestionar el cambio de estado de los pedidos
-    public GenericResponse<PedidoDTOAdmin>prepararPedido(Pedido p) {
+    public GenericResponse<PedidoDTO>prepararPedido(Pedido p) {
         if(p.getEstadoPedido()==PENDIENTE){
             p.setEstadoPedido(EN_PROCESO);
             return new GenericResponse<>(TIPO_DATA, RPTA_OK, "El pedido se está procesando", this.obtenerPedidoDto(p));
@@ -152,7 +149,7 @@ public class CheckoutService{
             return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede procesar porque ya ha sido procesado", this.obtenerPedidoDto(p));
         }
     }
-    public GenericResponse<PedidoDTOAdmin>enviarPedido(Pedido p, Usuario repartidor) {
+    public GenericResponse<PedidoDTO>enviarPedido(Pedido p, Usuario repartidor) {
         try {
             if(p.getEstadoPedido()==EN_PROCESO && p.getRepartidor()==null){
                 p.setRepartidor(repartidor);
@@ -173,7 +170,7 @@ public class CheckoutService{
 
 
     }
-    public GenericResponse<PedidoDTOAdmin>cancelarPedido(Pedido p){
+    public GenericResponse<PedidoDTO>cancelarPedido(Pedido p){
         if(p.getEstadoPedido()==ENTREGADO){
             return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede cancelar porque ya ha sido completado", null);
         }
@@ -191,7 +188,7 @@ public class CheckoutService{
             return new GenericResponse<>(TIPO_DATA, RPTA_OK, "Pedido cancelado con éxito", this.obtenerPedidoDto(p));
         }
     }
-    public GenericResponse<PedidoDTOAdmin>entregarPedido(Pedido p){
+    public GenericResponse<PedidoDTO>entregarPedido(Pedido p){
         if(p.getEstadoPedido()==CANCELADO){
             return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se puede entregar el pedido porque se ha cancelado", null);
         }
@@ -205,106 +202,21 @@ public class CheckoutService{
     }
 
     //Crear PedidoDTO y Lista PedidoDTO
-    public PedidoDTOAdmin obtenerPedidoDto(Pedido p){
+    public PedidoDTO obtenerPedidoDto(Pedido p){
         List<DetalleDTO> listaDetalles = new ArrayList<>();
         for(DetallePedido detalle: p.getDetalles()){
             listaDetalles.add(new DetalleDTO(detalle));
         }
-        return new PedidoDTOAdmin(p, listaDetalles);
+        return new PedidoDTO(p, listaDetalles);
     }
-    public List<PedidoDTOAdmin>crearListaPedidosDTO(List<Pedido> listaPedidos){
-        List<PedidoDTOAdmin>listaPedidosDTO = new ArrayList<>();
+    public List<PedidoDTO>crearListaPedidosDTO(List<Pedido> listaPedidos){
+        List<PedidoDTO>listaPedidosDTO = new ArrayList<>();
         for(Pedido pedido : listaPedidos){
             listaPedidosDTO.add(obtenerPedidoDto(pedido));
         }
         return listaPedidosDTO;
     }
-//
-//    //3.- ValidarPago (PENDIENTE --> EN PROCESO)
-//    public GenericResponse<PedidoDTOAdmin>prepararPedido(long idPedido){
-//        Optional<Pedido> optP = pedidoRepository.findById(idPedido);
-//        if(optP.isPresent()){
-//            Pedido pedido = optP.get();
-//            if(pedido.getEstadoPedido()==PENDIENTE){
-//                pedido.setEstadoPedido(EN_PROCESO);
-//                return new GenericResponse<>(TIPO_DATA, RPTA_OK, "El pedido se está procesando", this.obtenerPedidoDto(pedido));
-//            }
-//            else{
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede procesar porque ya ha sido procesado", this.obtenerPedidoDto(pedido));
-//            }
-//        }else return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra el pedido", null);
-//    }
-    //4.- EnviarPedido(EN PROCESO --> ENVIADO)
-//    public GenericResponse<PedidoDTOAdmin>asignarPedido(long idPedido, long idRepartidor){
-//        Optional<Pedido> optP = pedidoRepository.findById(idPedido);
-//        Optional<Usuario> optRepart = usuarioRepository.findById(idRepartidor);
-//        if(!optP.isPresent()){
-//            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra el pedido", null);
-//        }
-//        else if(!optRepart.isPresent()) {
-//            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra el repartidor", null);
-//        }
-//        else if(optRepart.get().getRol()!= Rol.REPARTIDOR){
-//            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El usuario introducido no es un repartidor", null);
-//        }
-//        else{
-//            Pedido p = optP.get();
-//            Usuario repartidor = optRepart.get();
-//            if(p.getEstadoPedido()!=EN_PROCESO || p.getRepartidor()!=null){
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede enviar todavía o ya ha sido enviado", null);
-//            }
-//            else {
-//                p.setRepartidor(repartidor);
-//                p.setEstadoPedido(ENVIADO);
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido se ha enviado correctamente",
-//                        this.obtenerPedidoDto(p));
-//            }
-//        }
-//    }
-    //5.- Cancelar Pedido(PENDIENTE, EN_PROCESO o ENVIADO --> CANCELADO
-//    public GenericResponse<PedidoDTOAdmin> cancelarPedido(long idPedido){
-//        Optional<Pedido>optP = pedidoRepository.findById(idPedido);
-//        if(optP.isPresent()){
-//            Pedido p = optP.get();
-//            if(p.getEstadoPedido()==ENTREGADO){
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede cancelar porque ya ha sido completado", null);
-//            }
-//            else if(p.getEstadoPedido()==CANCELADO){
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "El pedido no se puede cancelar porque ya ha sido cancelado", null);
-//            } else{
-//                p.setEstadoPedido(CANCELADO);
-//                p.setRepartidor(null);
-//                List<DetallePedido> listaDetalles = p.getDetalles();
-//                for(DetallePedido detalle : listaDetalles){
-//                    Producto prod = detalle.getProducto();
-//                    int cantidad = detalle.getCantidad();
-//                    prod.setStock(prod.getStock()+cantidad);
-//                }
-//                return new GenericResponse<>(TIPO_DATA, RPTA_OK, "Pedido cancelado con éxito", this.obtenerPedidoDto(p));
-//            }
-//        }else{
-//            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra el pedido a cancelar", null);
-//        }
-//    }
-    //6.- Completar Pedido (ENVIADO --> ENTREGADO)
-//    public GenericResponse<PedidoDTOAdmin> completarPedido(long idPedido){
-//        Optional<Pedido>optP = pedidoRepository.findById(idPedido);
-//        if(optP.isPresent()){
-//            Pedido p = optP.get();
-//            if(p.getEstadoPedido()==CANCELADO){
-//                return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se puede entregar el pedido porque se ha cancelado", null);
-//            }
-//            else if(p.getEstadoPedido() == ENVIADO){
-//                p.setEstadoPedido(ENTREGADO);
-//                return new GenericResponse<>(TIPO_DATA, RPTA_OK, "El pedido se ha entregado y completado con éxito", this.obtenerPedidoDto(p));
-//            }
-//            else {
-//                return new GenericResponse<>(TIPO_DATA, RPTA_OK, "El pedido todavía no se ha enviado", null);
-//            }
-//        }else{
-//            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se ha encontrado el pedido", null);
-//        }
-//    }
+
 }
 
 

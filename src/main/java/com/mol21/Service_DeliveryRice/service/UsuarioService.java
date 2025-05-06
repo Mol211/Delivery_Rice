@@ -22,23 +22,23 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final DireccionRepository direccionRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder  passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository, DireccionRepository direccionRepository, PasswordEncoder passwordEncoder) {
-        this.usuarioRepository = usuarioRepository
-        ;
+        this.usuarioRepository = usuarioRepository;
         this.direccionRepository = direccionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     //El administrador debe tener un metodo para listar usuarios y otro para clientes
     //Registrar un usuario
-    private GenericResponse<UsuarioDTO> registrarUsuario(RegistrarUsuarioDTO regUsuario, Rol rol) {
+    public GenericResponse<UsuarioDTO> registrarUsuario(RegistrarUsuarioDTO regUsuario, Rol rol) {
+
         if (usuarioRepository.existsByEmail(regUsuario.getU().getEmail())) {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
-                    "El usuario ya está registrado",
+                    "Ya existe un usuario con ese correo, introduzca uno válido",
                     null
             );
         }
@@ -55,15 +55,6 @@ public class UsuarioService {
 
     //Crear un usuario si no existe el Email en la BD
     public GenericResponse<UsuarioDTO> crearUsuario(RegistrarUsuarioDTO regUsuario, Rol rol) {
-        if (usuarioRepository.existsByEmail(regUsuario.getU().getEmail())) {
-            return new GenericResponse<>(
-                    Global.TIPO_AUTH,
-                    Global.RPTA_WARNING,
-                    "Ya existe un usuario con ese correo, introduzca uno válido",
-                    null
-            );
-        } else {
-
             regUsuario.getU().setRol(rol);
             regUsuario.getU().setPassword(passwordEncoder.encode(regUsuario.getU().getPassword()));
             UsuarioDTO usuarioDto = new UsuarioDTO(usuarioRepository.save(regUsuario.getU()));
@@ -74,16 +65,21 @@ public class UsuarioService {
                     Global.RPTA_OK,
                     "Se ha creado un nuevo usuario",
                     usuarioDto);
-        }
-
-
     }
 
    //Login de usuario
     public GenericResponse<UsuarioDTO> login(String email, String password) {
         Optional<Usuario> optU = usuarioRepository.findByEmail(email);
-        //Optional<Usuario> usuarioOptional = repository.login(email, password);
-        if (optU.isPresent()) {
+        if (!optU.isPresent()) {
+            //Si usuario no existe, lanza un mensaje de error y no devuelve cuerpo.
+            return new GenericResponse<>(
+                    Global.TIPO_AUTH,
+                    Global.RPTA_WARNING,
+                    "Usuario no encontrado",
+                    null
+            );
+        }
+        else {
             //Si usuario existe se instancia
             Usuario u = optU.get();
             String passwordT = optU.get().getPassword();
@@ -91,7 +87,6 @@ public class UsuarioService {
             System.out.println("Contraseña ingresada: " + password);
             System.out.println("Hash de la BD: " + passwordT);
             if (passwordEncoder.matches(password, passwordT)) {
-            //if (password.equals(usuario.getPassword())) {
                 return new GenericResponse<>(
                         Global.TIPO_AUTH,
                         Global.RPTA_OK,
@@ -106,14 +101,6 @@ public class UsuarioService {
                         null
                 );
             }
-        }
-        else {
-            return new GenericResponse<>(
-                    Global.TIPO_AUTH,
-                    Global.RPTA_WARNING,
-                    "Usuario no encontrado",
-                    null
-            );
         }
     }
 
@@ -132,7 +119,6 @@ public class UsuarioService {
             }
             else {
                 //Obtenemos usuario de BD
-
                 usuarioExistente.setEmail(u.getEmail());
                 usuarioExistente.setPassword(passwordEncoder.encode(u.getPassword()));
                 usuarioExistente.setNombre(u.getNombre());
@@ -141,7 +127,7 @@ public class UsuarioService {
                 return new GenericResponse<>(
                         Global.TIPO_AUTH,
                         Global.RPTA_OK,
-                        "Se han actualizado los datos del usuario " + usuarioExistente.get_id(),
+                        "Se han actualizado los datos del usuario ",
                         new UsuarioDTO(usuarioRepository.save(usuarioExistente))
                 );
             }
@@ -151,7 +137,7 @@ public class UsuarioService {
             return new GenericResponse<>(
                     Global.TIPO_AUTH,
                     Global.RPTA_WARNING,
-                    "No se encuentra el usuario",
+                    "Usuario no encontrado",
                     null
             );
         }

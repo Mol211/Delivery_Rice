@@ -1,10 +1,6 @@
 package com.mol21.Service_DeliveryRice.model.DTO;
-
 import com.mol21.Service_DeliveryRice.model.Rol;
 import com.mol21.Service_DeliveryRice.model.Usuario;
-
-import java.time.LocalDateTime;
-
 public class UsuarioDTO {
 
     private Long id;

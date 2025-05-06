@@ -255,46 +255,6 @@ public class DireccionService {
             }
         }
     }
-
-
-    //6.-)Eliminar varias direcciones
-    public GenericResponse<Void> eliminarDirecciones(List<Long> ids) {
-        List<Long> eliminadas = new ArrayList<>();
-        List<Long> noEncontradas = new ArrayList<>();
-        for (Long id : ids) {
-            Optional<Direccion> optD = repository.findById(id);
-            if (optD.isPresent()) {
-                repository.delete(optD.get());
-                 eliminadas.add(id);
-            } else {
-                noEncontradas.add(id);
-            }
-        }
-
-        if(noEncontradas.isEmpty()){
-            return new GenericResponse<>(
-                    Global.TIPO_DATA,
-                    Global.RPTA_OK,
-                    "Direcciones eliminadas",
-                    null
-            );
-        }else if(eliminadas.isEmpty()){
-            return new GenericResponse<>(
-                    Global.TIPO_DATA,
-                    Global.RPTA_WARNING,
-                    "No se han encontrado las direcciones a eliminar",
-                    null
-            );
-        }else{
-            return new GenericResponse<>(
-                    Global.TIPO_DATA,
-                    Global.RPTA_WARNING,
-                    "Algunas direcciones no fueron encontradas"+ noEncontradas,
-                    null
-            );
-        }
-    }
-
 }
 
 

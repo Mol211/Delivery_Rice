@@ -1,6 +1,6 @@
 package com.mol21.Service_DeliveryRice.controller;
 
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTOCliente;
+import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
 import com.mol21.Service_DeliveryRice.service.PedidoService;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +19,12 @@ public class PedidoController {
         this.pedidoService = pedidoService;
     }
      @GetMapping("/cliente/{usuarioId}")
-    public GenericResponse<List<PedidoDTOCliente>>obtenerPedidos(@PathVariable long usuarioId){
+    public GenericResponse<List<PedidoDTO>>obtenerPedidos(@PathVariable long usuarioId){
         return pedidoService.obtenerPedidosUsuario(usuarioId);
     }
 
     @GetMapping("/{pedidoId}")
-    public GenericResponse<PedidoDTOCliente>obtenerPedido(@PathVariable long pedidoId){
+    public GenericResponse<PedidoDTO>obtenerPedido(@PathVariable long pedidoId){
         return pedidoService.obtenerPedidoId(pedidoId);
     }
 }

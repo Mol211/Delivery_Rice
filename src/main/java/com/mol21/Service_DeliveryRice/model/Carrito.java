@@ -33,7 +33,7 @@ public class Carrito {
     private List<ItemCarrito> items = new ArrayList<>();
 
     private boolean procesado ;
-    //al pasar a true se creará el pedido y el carrito será eliminado
+    //al pasar a true se creará el pedido
 
     @OneToOne(mappedBy = "carrito", cascade = CascadeType.ALL)
     private Pedido pedido; // Relación con Pedido

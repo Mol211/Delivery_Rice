@@ -15,7 +15,7 @@ public class GenericResponse<T> {
 
     public GenericResponse(String type, T body) {
         this.type = type;
-        this.rpta = 0;  // O el valor que consideres apropiado
+        this.rpta = 0;
         this.message = "";
         this.body = body;
     }

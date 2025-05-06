@@ -1,27 +1,18 @@
 package com.mol21.Service_DeliveryRice.controller;
 
-import com.mol21.Service_DeliveryRice.model.Carrito;
 import com.mol21.Service_DeliveryRice.model.DTO.CarritoDTO;
 import com.mol21.Service_DeliveryRice.model.MetodoPago;
-import com.mol21.Service_DeliveryRice.model.Usuario;
 import com.mol21.Service_DeliveryRice.service.CarritoService;
-import com.mol21.Service_DeliveryRice.service.ItemService;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
-import static com.mol21.Service_DeliveryRice.utils.Global.*;
 
 @RestController
 @RequestMapping("api/carrito")
 public class CarritoController {
     private final CarritoService carritoService;
-    private final ItemService itemService;
-    public CarritoController(CarritoService carritoService, ItemService itemService){
+    public CarritoController(CarritoService carritoService){
         this.carritoService = carritoService;
-
-        this.itemService = itemService;
     }
     @GetMapping("/{idUsuario}")
     public GenericResponse<CarritoDTO> obtenerCarrito(@PathVariable long idUsuario){
@@ -36,7 +27,9 @@ public class CarritoController {
             return carritoService.vaciarCarrito(idUsuario);
     }
     @PostMapping("/procesar/{idCarrito}")
-    public GenericResponse<Object> procesarCarrito(@PathVariable long idCarrito, @RequestParam MetodoPago metodoPago, @RequestParam long idDireccion){
+    public GenericResponse<Object> procesarCarrito(@PathVariable long idCarrito,
+                                                   @RequestParam MetodoPago metodoPago,
+                                                   @RequestParam long idDireccion){
         return carritoService.procesarPedido(idCarrito, metodoPago, idDireccion);
     }
 }

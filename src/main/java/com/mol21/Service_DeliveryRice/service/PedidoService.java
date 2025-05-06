@@ -1,8 +1,7 @@
 package com.mol21.Service_DeliveryRice.service;
 
 import com.mol21.Service_DeliveryRice.model.DTO.DetalleDTO;
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTOAdmin;
-import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTOCliente;
+import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
 import com.mol21.Service_DeliveryRice.model.DetallePedido;
 import com.mol21.Service_DeliveryRice.model.Pedido;
 import com.mol21.Service_DeliveryRice.model.Usuario;
@@ -30,7 +29,7 @@ public class PedidoService {
         this.usuarioRepository = usuarioRepository;
     }
     //1.- Obtener Pedidos de Usuario
-    public GenericResponse<List<PedidoDTOCliente>> obtenerPedidosUsuario(long usuarioId) {
+    public GenericResponse<List<PedidoDTO>> obtenerPedidosUsuario(long usuarioId) {
         Optional<Usuario> optU = usuarioRepository.findById(usuarioId);
         if (optU.isPresent()) {
             Usuario usuario=optU.get();
@@ -41,11 +40,11 @@ public class PedidoService {
                     crearListaPedidosDTO(pedidoRepository.findAllByUsuario(usuario))
             );
         } else {
-            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra ese usuario", null);
+            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra ese usuario", new ArrayList<>());
         }
     }
     //2.- Obtener Pedido por Id
-    public GenericResponse<PedidoDTOCliente> obtenerPedidoId(long pedidoId){
+    public GenericResponse<PedidoDTO> obtenerPedidoId(long pedidoId){
         Optional<Pedido> optP = pedidoRepository.findById(pedidoId);
         if (optP.isPresent()) {
             Pedido pedido = optP.get();
@@ -55,17 +54,17 @@ public class PedidoService {
     }
     // Podría crear un metodo para repetir un pedido pasado, volver a meterlo en un carrito y crear un nuevo pedido. De momento no.
     //Crear PedidoDTO
-    public PedidoDTOCliente obtenerPedidoDto(Pedido p) {
+    public PedidoDTO obtenerPedidoDto(Pedido p) {
         List<DetalleDTO> listaDetalles = new ArrayList<>();
         for (DetallePedido detalle : p.getDetalles()) {
             listaDetalles.add(new DetalleDTO(detalle));
         }
-        return new PedidoDTOCliente(p, listaDetalles);
+        return new PedidoDTO(p, listaDetalles);
     }
 
     //Crear Lista PedidosDTO
-    public List<PedidoDTOCliente> crearListaPedidosDTO(List<Pedido> listaPedidos) {
-        List<PedidoDTOCliente> listaPedidosDTO = new ArrayList<>();
+    public List<PedidoDTO> crearListaPedidosDTO(List<Pedido> listaPedidos) {
+        List<PedidoDTO> listaPedidosDTO = new ArrayList<>();
         for (Pedido pedido : listaPedidos) {
             listaPedidosDTO.add(obtenerPedidoDto(pedido));
         }

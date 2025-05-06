@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class PedidoDTOCliente {
+public class PedidoDTO {
     private long id;
     private EstadoPedido estadoPedido;
     private BigDecimal precioTotal;
@@ -19,7 +19,7 @@ public class PedidoDTOCliente {
     private MetodoPago metodoPago;
 
 
-    public PedidoDTOCliente(Pedido pedido, List<DetalleDTO> pedidosDTOS) {
+    public PedidoDTO(Pedido pedido, List<DetalleDTO> pedidosDTOS) {
         this.id = pedido.getId_pedido();
         this.direccion = new DireccionDTO(pedido.getDireccionEnvio());
         this.precioTotal = pedido.getTotalPrecio();
@@ -29,7 +29,7 @@ public class PedidoDTOCliente {
         this.listaDetalles = pedidosDTOS;
         this.fechaCreacion = pedido.getFechaCreacion();
     }
-    public PedidoDTOCliente(Pedido pedido){
+    public PedidoDTO(Pedido pedido){
         this.id = pedido.getId_pedido();
         this.direccion = new DireccionDTO(pedido.getDireccionEnvio());
         this.precioTotal = pedido.getTotalPrecio();
