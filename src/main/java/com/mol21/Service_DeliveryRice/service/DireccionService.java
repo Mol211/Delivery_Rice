@@ -40,7 +40,7 @@ public class DireccionService {
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_OK,
-                    "Se ha obtenido la lista de las direcciones del usuario " + usuarioId,
+                    "Se ha obtenido la lista de las direcciones del usuario ",
                     direccionesDTO
             );
         } else {
@@ -101,12 +101,13 @@ public class DireccionService {
 
             //Marcamos la direccion como Principal
             direccionTemporal.setEsPrincipal(true);
+            repository.save(direccionTemporal);
 
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_OK,
                     "dirección establecida como principal",
-                    new DireccionDTO(repository.save(direccionTemporal))
+                    new DireccionDTO(direccionTemporal)
             );
         }
     }
@@ -120,7 +121,7 @@ public class DireccionService {
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_WARNING,
-                    "El usuario asociado no existe",
+                    "No se encuentra el usuario",
                     null
             );
         } else {
@@ -143,11 +144,12 @@ public class DireccionService {
                 }
                 //Le asignamos ese usuario a la direccion
                 d.setUsuario(u);
+                repository.save(d);
                 return new GenericResponse<>(
                         Global.TIPO_DATA,
                         Global.RPTA_OK,
                         "Se ha guardado la direccion con exito",
-                        new DireccionDTO(repository.save(d)));
+                        new DireccionDTO(d));
             }
         }
     }
@@ -170,18 +172,19 @@ public class DireccionService {
             if (d.getUsuario() == null) {
                 d.setUsuario(usuarioDireccion);
             }
+            repository.save(d);
 
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_OK,
                     "Direccion actualizada correctamente",
-                    new DireccionDTO(repository.save(d))
+                    new DireccionDTO(d)
             );
         } else {
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_WARNING,
-                    "Esa direccion no existe",
+                    "La direccion introducida no es correcta",
                     null
             );
         }
@@ -202,7 +205,7 @@ public class DireccionService {
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_WARNING,
-                    "No se ha encontrado la direccion a eliminar",
+                    "La direccion introducida no es correcta",
                     null
             );
         }
@@ -214,7 +217,7 @@ public class DireccionService {
             return new GenericResponse<>(
                     Global.TIPO_DATA,
                     Global.RPTA_WARNING,
-                    "No se ha encontrado la direccion a eliminar",
+                    "La direccion introducida no es correcta",
                     null
             );
 
