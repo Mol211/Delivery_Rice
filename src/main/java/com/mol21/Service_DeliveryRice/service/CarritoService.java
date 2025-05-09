@@ -73,8 +73,6 @@ public class CarritoService {
                         obtenerCarritoDTO(carrito)
                 );
             }
-
-
         }
         //Si no se encuentra el ID
         else {
@@ -128,7 +126,7 @@ public class CarritoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se encuentra ese usuario",
+                    "No se ha encontrado el usuario",
                     null
             );
         }
@@ -195,7 +193,7 @@ public class CarritoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se encuentra el usuario",
+                    "No se ha encontrado el usuario",
                     null
             );
         }
@@ -255,7 +253,7 @@ public class CarritoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se encuentra el Carrito introducido",
+                    "No existe ese Carrito",
                     null
             );
         }
@@ -276,7 +274,7 @@ public class CarritoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se ha encontrado el carrito",
+                    "No existe ese Carrito",
                     null
             );
         } else {

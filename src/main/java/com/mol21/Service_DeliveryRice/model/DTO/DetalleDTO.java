@@ -20,7 +20,6 @@ public class DetalleDTO {
 
 
     public DetalleDTO (DetallePedido detalle){
-        this.id = detalle.getId();
         this.nombreProducto = detalle.getProducto().getNombre();
         this.cantidad = detalle.getCantidad();
         this.subTotal = detalle.getSubTotal();
