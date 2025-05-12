@@ -104,7 +104,7 @@ public class ItemService {
                         return new GenericResponse<>(
                                 TIPO_DATA,
                                 RPTA_WARNING,
-                                "Se ha eliminado el ItemCarrito ",
+                                "Item eliminado del carrito",
                                 null
                         );
                     }
@@ -257,7 +257,7 @@ public class ItemService {
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
-                        "Producto eliminado del carrito: " + itemDTO.getNombreProducto(),
+                        "Item eliminado del carrito",
                         carritoDTO
                 );
             }else{
