@@ -30,12 +30,6 @@ public class CarritoServiceTest {
   UsuarioRepository usuarioRepository;
   @Mock
   DireccionRepository direccionRepository;
-  @Mock
-  DetalleRepository detalleRepository;
-  @Mock
-  PedidoRepository pedidoRepository;
-  @Mock
-  ProductoRepository productoRepository;
   @InjectMocks
   CarritoService carritoService;
 
