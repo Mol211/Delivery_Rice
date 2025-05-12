@@ -1,19 +1,37 @@
 # Delivery_Rice
-## Backend de la aplicación del Proyecto Final de FP `Desarrollo de Aplicaciones Multiplataforma`
-Ecommerce-Arroceate es una plataforma de pedidos online especializada en arroces a domicilio. El proyecto está dividido en dos aplicaciones:
+## Backend for the Final Project of Víctor Molins Martínez (FPGS DAM)
 
-Backend (Server): Desarrollado en Spring Boot para gestionar el servidor, la base de datos, la autenticación de usuarios, productos, pedidos, etc.
-Frontend (Client): Desarrollado en Android Studio para permitir a los usuarios realizar pedidos, gestionar sus cuentas y ver los productos desde sus dispositivos móviles.
+## 📚 Table of Contents
 
-## Descripción
-Este proyecto tiene como objetivo proporcionar una solución completa para un ecommerce de arroces, permitiendo a los usuarios realizar pedidos de entrantes, arroces y postres, seleccionando sus direcciones de envío y pagando a través de varios métodos de pago. 
-El sistema está dividido en un backend que maneja la lógica de negocio y la base de datos, y un frontend en Android que interactúa con el usuario.
+- [Description](#descripción)
+- [Features](#características)
+- [Technologies & Tools](#tecnologías-y-herramientas)
 
-## Principales Característicacs
-🛍️ Gestión de Productos: CRUD para productos con categorías como Entrantes, Arroces y Postres.
+## 📝 Description
+Delivery_Rice is an e-commerce platform that allows users to order high-quality rice from anywhere. It's a fast alternative to traditional fast food — quick, but much better.
+This backend is built with the Spring Boot framework and provides a RESTful API that allows users to interact with the platform, manage their accounts, and place orders.
 
-📦 Gestión de Pedidos: Los clientes pueden realizar pedidos, elegir una dirección de envío y modificarla, seleccionar un método de pago, comprobar el estado de su pedido y un historial de sus pedidos anteriores.
+## ✨ Features
+- User registration and login
+- Role-based access control (Client, Delivery, Admin)
+- CRUD operations for user addresses
+- CRUD operations for products (Admin role only)
+- Multiple payment options: Bizum, Cash, Card
+- Order management:
+  - Place orders
+  - Select and modify shipping addresses
+  - Choose payment methods
+  - Track order status
+  - View order history
 
-👤 Gestión de Usuarios y Roles: Registro de clientes y Login. Posibles Roles: Admin, Cliente y Repartidor.
-
-💳 Opciones de Pago: Efectivo, Bizum, Tarjeta.
+## 🛠️ Technologies & Tools
+- Java 21 (JDK)
+- Spring Boot
+- Spring Security
+- Hibernate JPA
+- RESTful API
+- Layered Architecture (Repository, Service, Controller)
+- Design patterns used:
+  - Repository Pattern
+  - DTO Pattern
+- Unit testing with JUnit and Mockito
