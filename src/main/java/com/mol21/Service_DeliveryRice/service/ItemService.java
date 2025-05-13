@@ -119,11 +119,12 @@ public class ItemService {
                         carritoRepository.save(carrito);
                         itemRepository.save(item);
                         System.out.println(item.toString());
+                        ItemDTO i = new ItemDTO(item);
                         return new GenericResponse<>(
                                 TIPO_DATA,
                                 RPTA_OK,
                                 "Producto modificado",
-                                new ItemDTO(item)
+                                i
                         );
                     }
                 }
@@ -157,7 +158,8 @@ public class ItemService {
                                 null);
                     }
                 }
-            }else{
+            }
+            else{
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_ERROR,
@@ -165,7 +167,8 @@ public class ItemService {
                         null);
             }
 
-        } else {
+        }
+        else {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_ERROR,
