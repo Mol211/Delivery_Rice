@@ -48,8 +48,15 @@ public class PedidoService {
         Optional<Pedido> optP = pedidoRepository.findById(pedidoId);
         if (optP.isPresent()) {
             Pedido pedido = optP.get();
-            return new GenericResponse<>(TIPO_DATA, RPTA_OK,"Se ha obtenido el pedido seleccionado", obtenerPedidoDto(pedido));
-    } else {return new GenericResponse<>(TIPO_DATA,RPTA_WARNING,"No se encuentra el Id introducido",null);
+            PedidoDTO pDTO = obtenerPedidoDto(pedido);
+            return new GenericResponse<>(
+                    TIPO_DATA,
+                    RPTA_OK,
+                    "Se ha obtenido el pedido seleccionado",
+                    pDTO
+            );
+    } else {
+            return new GenericResponse<>(TIPO_DATA,RPTA_WARNING,"No se encuentra el pedido",null);
         }
     }
     // Podría crear un metodo para repetir un pedido pasado, volver a meterlo en un carrito y crear un nuevo pedido. De momento no.

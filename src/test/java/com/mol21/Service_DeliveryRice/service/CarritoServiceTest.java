@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static com.mol21.Service_DeliveryRice.utils.Global.RPTA_OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -30,6 +31,13 @@ public class CarritoServiceTest {
   UsuarioRepository usuarioRepository;
   @Mock
   DireccionRepository direccionRepository;
+  @Mock
+  DetalleRepository detalleRepository;
+  @Mock
+  PedidoRepository pedidoRepository;
+
+  @Mock
+  ProductoRepository productoRepository;
   @InjectMocks
   CarritoService carritoService;
 
@@ -263,6 +271,7 @@ public class CarritoServiceTest {
     d.setId(12L);
     Usuario u = new Usuario();
     Carrito c = new Carrito();
+    Pedido pedido = new Pedido();
     c.setUsuario(u);
     ItemCarrito i = new ItemCarrito();
     Producto p = new Producto();
@@ -281,16 +290,12 @@ public class CarritoServiceTest {
 
     when(direccionRepository.findById(d.getDireccion_id())).thenReturn(Optional.of(d));
     when(carritoRepository.findById(c.getCarrito_id())).thenReturn(Optional.of(c));
+    when(pedidoRepository.save(any(Pedido.class)))
+            .thenReturn(pedido);
+    when(productoRepository.save(p)).thenReturn(p);
     GenericResponse<Object>response = carritoService.procesarPedido(c.getCarrito_id(), MetodoPago.TARJETA, d.getDireccion_id());
 
     assertEquals(MESSAGE_OK_PEDIDO_PROCESADO,response.getMessage());
 
   }
-
-
-
-
-
-
-
 }

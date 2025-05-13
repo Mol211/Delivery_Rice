@@ -102,7 +102,7 @@ public class CheckoutService{
         if(optP.isPresent()){
             return new GenericResponse<>(TIPO_DATA, RPTA_OK,"Se ha obtenido el pedido seleccionado",obtenerPedidoDto(optP.get()));
         }else{
-            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING,"Ese pedido no existe",null);
+            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING,"No se encuentra el pedido",null);
         }
     }
     //3.- Cambiar de estado un Pedido("preparar", "enviar","cancelar","completar")
@@ -110,7 +110,7 @@ public class CheckoutService{
         Optional<Usuario> optRep = (idRepartidor!=null) ? usuarioRepository.findById(idRepartidor) : Optional.empty();
         Optional<Pedido>optP = pedidoRepository.findById(idPedido);
         if(!optRep.isPresent() && idRepartidor!=null){
-            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se encuentra el repartidor introducido",null);
+            return new GenericResponse<>(TIPO_DATA, RPTA_WARNING, "No se ha encontrado el repartidor",null);
         }
         if (optP.isPresent()){
             Pedido p = optP.get();
