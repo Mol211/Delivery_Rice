@@ -33,7 +33,7 @@ public class ProductoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se han encontrado productos en esa categoria",
+                    "No se encuentra el producto",
                     null
             );
         } else{
@@ -82,11 +82,13 @@ public class ProductoService {
                     null
             );
         } else {
+            repository.save(p);
+            ProductoDTO pDTO = new ProductoDTO(p);
             return new GenericResponse<>(
               TIPO_DATA,
               RPTA_OK,
               "Producto ingresado con éxito",
-              new ProductoDTO(repository.save(p))
+              pDTO
             );
         }
     }
@@ -98,7 +100,7 @@ public class ProductoService {
             return new GenericResponse<>(
                     TIPO_DATA,
                     RPTA_WARNING,
-                    "No se ha encontrado ese producto",
+                    "No se encuentra el producto",
                     null
             );
         } else {
@@ -125,15 +127,16 @@ public class ProductoService {
                             p.setPrecio((BigDecimal) valor);
                             break;
                         default:
-                            throw new IllegalArgumentException("Campo no válido: " + campo);
+                            throw new IllegalArgumentException("Campo no válido");
                     }
                 });
-
+                repository.save(p);
+                ProductoDTO pDTO = new ProductoDTO(p);
                 return new GenericResponse<>(
                         TIPO_DATA,
                         RPTA_OK,
                         "Producto modifcado con éxito",
-                        new ProductoDTO(repository.save(p))
+                        pDTO
                 );
             }catch(IllegalArgumentException e){
                 return new GenericResponse<>(
