@@ -35,3 +35,11 @@ This backend is built with the Spring Boot framework and provides a RESTful API 
   - Repository Pattern
   - DTO Pattern
 - Unit testing with JUnit and Mockito
+
+## Instalation
+1. Open your mySQL Server
+2. Run the application with 'mvn spring-boot:run', the first run will generate the database automatically.
+3. Open phpMyAdmin and Click on 'Import' and select the 'bd_service_deliveryRice.sql' file.
+
+## Testing
+- Run all unit tests with: 'mvn clean test' 
