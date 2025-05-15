@@ -3,9 +3,12 @@
 
 ## 📚 Table of Contents
 
-- [Description](#descripción)
-- [Features](#características)
-- [Technologies & Tools](#tecnologías-y-herramientas)
+
+- [Description](#Description)
+- [Features](#Features)
+- [Technologies & Tools](#Technologies_&_Tools)
+- [Installation](#Installation)
+- [Testing](#testing)
 
 ## 📝 Description
 Delivery_Rice is an e-commerce platform that allows users to order high-quality rice from anywhere. It's a fast alternative to traditional fast food — quick, but much better.
