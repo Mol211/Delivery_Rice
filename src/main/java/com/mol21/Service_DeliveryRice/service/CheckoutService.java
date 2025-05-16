@@ -3,6 +3,7 @@ package com.mol21.Service_DeliveryRice.service;
 import com.mol21.Service_DeliveryRice.model.*;
 import com.mol21.Service_DeliveryRice.model.DTO.DetalleDTO;
 import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
+import com.mol21.Service_DeliveryRice.model.DTO.UsuarioDTO;
 import com.mol21.Service_DeliveryRice.persistence.PedidoRepository;
 import com.mol21.Service_DeliveryRice.persistence.UsuarioRepository;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.logging.Logger;
 
 import static com.mol21.Service_DeliveryRice.model.EstadoPedido.*;
 import static com.mol21.Service_DeliveryRice.utils.Global.*;
@@ -198,6 +201,29 @@ public class CheckoutService{
         }
         else {
             return new GenericResponse<>(TIPO_DATA, RPTA_OK, "El pedido todavía no se ha enviado", null);
+        }
+    }
+    public GenericResponse<UsuarioDTO>getUnRepartidor(){
+        Optional<List<Usuario>> optList = usuarioRepository.findAllByRol(Rol.REPARTIDOR);
+        if(optList.isPresent()){
+            List<Usuario> listaRepartidores = optList.get();
+            Random randomIndex = new Random();
+            int indexRepartidor = randomIndex.nextInt(listaRepartidores.size());
+            Usuario u = listaRepartidores.get(indexRepartidor);
+            UsuarioDTO uDTO = new UsuarioDTO(u);
+            return new GenericResponse<>(
+                    TIPO_DATA,
+                    RPTA_OK,
+                    "Se ha obtenido un repartidor",
+                    uDTO
+            );
+        }
+        else {
+            return new GenericResponse<>(TIPO_DATA,
+                    RPTA_WARNING,
+                    "No se encuentra ningún repartidor",
+                    null
+            );
         }
     }
 

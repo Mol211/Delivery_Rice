@@ -1,6 +1,7 @@
 package com.mol21.Service_DeliveryRice.controller;
 
 import com.mol21.Service_DeliveryRice.model.DTO.PedidoDTO;
+import com.mol21.Service_DeliveryRice.model.DTO.UsuarioDTO;
 import com.mol21.Service_DeliveryRice.model.EstadoPedido;
 import com.mol21.Service_DeliveryRice.service.CheckoutService;
 import com.mol21.Service_DeliveryRice.utils.GenericResponse;
@@ -37,6 +38,10 @@ public class CheckoutController {
             //preparar, enviar, cancelar, completar
             @RequestParam (value = "idRepartidor", required = false) Long idRepartidor){
         return checkoutService.cambiarEstado(idPedido,accion,idRepartidor);
+    }
+    @GetMapping("/repartidor")
+    public GenericResponse<UsuarioDTO> obtenerRepartidorRandom(){
+        return checkoutService.getUnRepartidor();
     }
 }
 

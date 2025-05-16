@@ -40,9 +40,14 @@ This backend is built with the Spring Boot framework and provides a RESTful API 
 - Unit testing with JUnit and Mockito
 
 ## Instalation
-1. Open your mySQL Server
-2. Run the application with 'mvn spring-boot:run', the first run will generate the database automatically.
-3. Open phpMyAdmin and Click on 'Import' and select the 'bd_service_deliveryRice.sql' file.
+1. Open your mySQL Server (default port: 3306)
+2. The application is configured to use the default phpMyAdmin credentials:  
+  **Username:** `root`
+  **Password:** *(blank)*
+   If your MySQL setup uses different credentials, update the `spring.datasource.username` and `spring.datasource.password` fields in `src/main/resources/application.properties`.
+3. Run the application with `mvn spring-boot:run`, the first run will generate the database automatically. The application runs on the default phpMyAdmin user "root".
+4. Open phpMyAdmin and Click on `Import` and select the `bd_service_deliveryRice.sql` file.
+
 
 ## Testing
-- Run all unit tests with: 'mvn clean test' 
+- Run all unit tests with: `mvn clean test` 
