@@ -73,7 +73,13 @@ public class ProductoService {
 
     //2.- Guardar un Producto
     public GenericResponse<ProductoDTO> registrarProducto(Producto p){
-        Optional<Producto> optP = repository.findById(p.getId_product());
+        System.out.println(p.getNombre());
+        System.out.println(p.getCategoriaProducto());
+        System.out.println(p.getStock());
+        System.out.println(p.getDescripcion());
+        System.out.println(p.getImagenUrl());
+        System.out.println(p.getPrecio());
+        Optional<Producto> optP = repository.findByNombre(p.getNombre());
         if(optP.isPresent()){
             return new GenericResponse<>(
                     TIPO_DATA,
@@ -81,7 +87,8 @@ public class ProductoService {
                     "Ese producto ya existe",
                     null
             );
-        } else {
+        }
+        else {
             repository.save(p);
             ProductoDTO pDTO = new ProductoDTO(p);
             return new GenericResponse<>(

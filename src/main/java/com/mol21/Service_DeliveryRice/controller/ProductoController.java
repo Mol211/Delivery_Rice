@@ -35,7 +35,6 @@ public class ProductoController {
 
     @PostMapping()
     public GenericResponse<ProductoDTO> registrarProducto(@RequestBody Producto p){
-        System.out.println("El id del producto es " +p.getId_product());
         return service.registrarProducto(p);
     }
 
